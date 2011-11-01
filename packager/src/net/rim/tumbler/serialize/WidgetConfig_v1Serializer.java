@@ -18,8 +18,8 @@ package net.rim.tumbler.serialize;
 import java.util.Map;
 import java.util.Vector;
 
+import net.rim.tumbler.config.IWidgetConfig;
 import net.rim.tumbler.config.WidgetAccess;
-import net.rim.tumbler.config.WidgetConfig;
 import net.rim.tumbler.config.WidgetFeature;
 import net.rim.tumbler.exception.ValidationException;
 import net.rim.tumbler.json4j.JSONArray;
@@ -34,9 +34,9 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
 
     private StringBuffer _buffer;
     private JSONObject _configValues;
-    private WidgetConfig _widgetConfig;
+    private IWidgetConfig _widgetConfig;
 
-    public WidgetConfig_v1Serializer( WidgetConfig widgetConfig, Map< String, Vector< String >> entryClassTable ) {
+    public WidgetConfig_v1Serializer( IWidgetConfig widgetConfig, Map< String, Vector< String >> entryClassTable ) {
         _buffer = new StringBuffer();
 
         _buffer.append( "var ConfigConstants = require(\"./ConfigConstants.js\"), \n" );
@@ -169,7 +169,7 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
 
             // add TransitionEffect configuration
             if( _widgetConfig.getTransitionType() != null ) {
-                _configValues.append( "transitionType", new JSExpression( _widgetConfig.getTransitionType() ) );
+                _configValues.put( "transitionType", new JSExpression( _widgetConfig.getTransitionType() ) );
 
                 if( _widgetConfig.getTransitionDuration() >= 0 ) {
                     _configValues.put( "transitionDuration", _widgetConfig.getTransitionDuration() );
@@ -200,12 +200,12 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
 
             // Debug issue fix ?
             if( _widgetConfig.isDebugEnabled() ) {
-                _configValues.append( "debugEnabled", _widgetConfig.isDebugEnabled() );
+                _configValues.put( "debugEnabled", _widgetConfig.isDebugEnabled() );
             }
 
             // Auto-Startup options
             if( _widgetConfig.allowInvokeParams() ) {
-                _configValues.append( "allowInvokeParams", _widgetConfig.allowInvokeParams() );
+                _configValues.put( "allowInvokeParams", _widgetConfig.allowInvokeParams() );
             }
 
             if( _widgetConfig.isStartupEnabled() ) {

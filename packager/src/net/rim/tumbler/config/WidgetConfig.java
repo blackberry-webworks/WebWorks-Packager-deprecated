@@ -28,7 +28,7 @@ import net.rim.tumbler.log.LogType;
 import net.rim.tumbler.log.Logger;
 import net.rim.tumbler.session.SessionManager;
 
-public class WidgetConfig {
+public class WidgetConfig implements IWidgetConfig {
     /**
      * Pre-compiled Pattern for validating and parsing of the version string. Valid version strings are:
      * 

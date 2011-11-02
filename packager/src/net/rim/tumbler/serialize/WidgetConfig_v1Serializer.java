@@ -165,17 +165,17 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
             _configValues.put( "onLocalPageLoad", _widgetConfig.getLocalPageLoad() );
 
             // add TransitionEffect configuration
-            if( _widgetConfig.getTransitionType() != null ) {
-                _configValues.put( "transitionType", new JSExpression( _widgetConfig.getTransitionType() ) );
-
-                if( _widgetConfig.getTransitionDuration() >= 0 ) {
-                    _configValues.put( "transitionDuration", _widgetConfig.getTransitionDuration() );
-                }
-
-                if( _widgetConfig.getTransitionDirection() != null ) {
-                    _configValues.put( "transitionDirection", new JSExpression( _widgetConfig.getTransitionDirection() ) );
-                }
-            }
+//            if( _widgetConfig.getTransitionType() != null ) {
+//                _configValues.put( "transitionType", new JSExpression( _widgetConfig.getTransitionType() ) );
+//
+//                if( _widgetConfig.getTransitionDuration() >= 0 ) {
+//                    _configValues.put( "transitionDuration", _widgetConfig.getTransitionDuration() );
+//                }
+//
+//                if( _widgetConfig.getTransitionDirection() != null ) {
+//                    _configValues.put( "transitionDirection", new JSExpression( _widgetConfig.getTransitionDirection() ) );
+//                }
+//            }
 
             // add cache options
             if( _widgetConfig.isCacheEnabled() != null ) {
@@ -218,7 +218,7 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
                     JSONArray featureList = new JSONArray();
 
                     if( key.getURI().toString().equals( "WidgetConfig.WIDGET_LOCAL_DOMAIN" ) ) {
-                        access.put( "uri", new JSExpression( "ConfigConstants.WIDGET_LOCAL_DOMAIN" ) );
+                        access.put( "uri", "WIDGET_LOCAL" );
                     } else {
                         access.put( "uri", key.getURI().toString() );
                     }

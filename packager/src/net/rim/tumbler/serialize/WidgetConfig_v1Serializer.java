@@ -38,12 +38,9 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
 
     public WidgetConfig_v1Serializer( IWidgetConfig widgetConfig, Map< String, Vector< String >> entryClassTable ) {
         _buffer = new StringBuffer();
-
-        _buffer.append( "var ConfigConstants = require(\"./ConfigConstants.js\"), \n" );
-        _buffer.append( "TransitionConstants = require(\"./TransitionConstants.js\"), \n" );
-        _buffer.append( "_self;\n\n" );
-        
+        _buffer.append( "var _self;\n\n" );
         _buffer.append( "_self = " );
+
         _configValues = new JSONObject();
 
         try {

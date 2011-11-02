@@ -54,7 +54,7 @@ public class WidgetPackager {
     public static final String SIGNATURE_KEY_FILE = "sigtool.csk";
 
     // TODO may need to put it in a different location
-    private static final String AUTOGEN_FILE = "config/CustomData.js";
+    private static final String AUTOGEN_FILE = "config/user.js";
 
     private static final int NO_ERROR_RETURN_CODE = 0;
     private static final int PACKAGE_ERROR_RCODE = 1;

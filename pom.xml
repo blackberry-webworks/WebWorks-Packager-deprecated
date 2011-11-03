@@ -75,7 +75,31 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					  <execution>
+							<id>copy-bin</id>
+							<phase>validate</phase>
+							<goals>
+								<goal>copy-resources</goal>
+							</goals>
+							<configuration>
+                                                            <outputDirectory>${basedir}/target/dependency/bin</outputDirectory>
+							<resources>          
+								<resource>
+									<directory>packager/bin</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>              
+						</configuration>            
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -94,7 +118,7 @@
 									<version>1.0.0.0</version>
 									<type>jar</type>
 									<overWrite>true</overWrite>
-									<outputDirectory></outputDirectory>
+                                                                        <outputDirectory>target/dependency/bin</outputDirectory>
 									<destFileName>bbwp.jar</destFileName>
 								</artifactItem>
 							</artifactItems>
@@ -156,6 +180,6 @@
 	</build>
 	
 	<properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+            <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 </project>

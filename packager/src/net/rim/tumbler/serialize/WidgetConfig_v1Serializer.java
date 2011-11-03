@@ -18,8 +18,8 @@ package net.rim.tumbler.serialize;
 import java.util.Map;
 import java.util.Vector;
 
-import net.rim.tumbler.config.IWidgetConfig;
 import net.rim.tumbler.config.WidgetAccess;
+import net.rim.tumbler.config.WidgetConfig;
 import net.rim.tumbler.config.WidgetFeature;
 import net.rim.tumbler.exception.ValidationException;
 import net.rim.tumbler.json4j.JSONArray;
@@ -34,9 +34,9 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
 
     private StringBuffer _buffer;
     private JSONObject _configValues;
-    private IWidgetConfig _widgetConfig;
+    private WidgetConfig _widgetConfig;
 
-    public WidgetConfig_v1Serializer( IWidgetConfig widgetConfig, Map< String, Vector< String >> entryClassTable ) {
+    public WidgetConfig_v1Serializer( WidgetConfig widgetConfig, Map< String, Vector< String >> entryClassTable ) {
         _buffer = new StringBuffer();
         _buffer.append( "var _self;\n\n" );
         _buffer.append( "_self = " );

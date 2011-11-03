@@ -99,8 +99,6 @@ public class ConfigXMLParser implements XMLParser {
                     processConnectionNode( node );
                 } else if( node.getNodeName().equals( "rim:navigation" ) ) {
                     processNavigationNode( node );
-                } else if( node.getNodeName().equals( "rim:cache" ) ) {
-                    processCacheNode( node );
                 } else if( node.getNodeName().equals( "name" ) ) {
                     _widgetConfig.setName( getTextValue( node ) );
                 } else if( node.getNodeName().equals( "description" ) ) {
@@ -604,68 +602,6 @@ public class ConfigXMLParser implements XMLParser {
             }
             _widgetConfig.setTransportOrder( transportArray );
         }
-    }
-
-    // Processing for the <rim:cache> node
-    private void processCacheNode( Node cacheNode ) throws Exception {
-
-        // get disableAllCache
-        NamedNodeMap attrs = cacheNode.getAttributes();
-        Node disableCacheAttrNode = attrs.getNamedItem( "disableAllCache" );
-        if( disableCacheAttrNode != null ) {
-            try {
-                // Obtain value
-                boolean disabledCache = Boolean.parseBoolean( disableCacheAttrNode.getNodeValue() );
-
-                // Flip the value before we set it
-                _widgetConfig.setCacheEnabled( !disabledCache );
-            } catch( Exception e ) {
-                // Default values are used if an error happens
-            }
-        }
-
-        // get aggressiveCacheAge
-        Node aCacheAgeAttrNode = attrs.getNamedItem( "aggressiveCacheAge" );
-        if( aCacheAgeAttrNode != null ) {
-            try {
-                int aCacheAgeValue = Integer.parseInt( aCacheAgeAttrNode.getNodeValue() );
-                _widgetConfig.setAggressiveCacheAge( aCacheAgeValue );
-            } catch( Exception e ) {
-                // Default values are used if an error happens
-            }
-        }
-
-        // Note: It is important to set the total BEFORE the individual item size
-        // since there are some constraints that depend on it
-
-        // get maxCacheSizeTotal
-        Node maxCacheTotalAttrNode = attrs.getNamedItem( "maxCacheSizeTotal" );
-        if( maxCacheTotalAttrNode != null ) {
-            try {
-                int maxCacheTotalValue = Integer.parseInt( maxCacheTotalAttrNode.getNodeValue() );
-                // Convert from kilobytes to bytes
-                _widgetConfig.setMaxCacheSize( maxCacheTotalValue * 1024 );
-            } catch( Exception e ) {
-                // Default values are used if an error happens
-            }
-        }
-
-        // get maxCacheSizeItem
-        Node maxCacheItemAttrNode = attrs.getNamedItem( "maxCacheSizeItem" );
-        if( maxCacheItemAttrNode != null ) {
-            try {
-                int maxCacheItemValue = Integer.parseInt( maxCacheItemAttrNode.getNodeValue() );
-                // Convert from kilobytes to bytes
-                if( maxCacheItemValue != -1 ) {
-                    _widgetConfig.setMaxCacheItemSize( maxCacheItemValue * 1024 );
-                } else {
-                    _widgetConfig.setMaxCacheItemSize( maxCacheItemValue );
-                }
-            } catch( Exception e ) {
-                // Default values are used if an error happens
-            }
-        }
-
     }
 
     private String processText( String text ) {

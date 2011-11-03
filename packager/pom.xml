@@ -1,0 +1,83 @@
+<project>
+
+  <groupId>net.rim.BBXwebworks</groupId>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>packager</artifactId>
+  <version>1.0.0.0</version>
+  <name>${project.artifactId}-1.0.0.0</name>
+  <packaging>jar</packaging>
+
+  <properties>
+		<product.version>1.0.0.0</product.version>
+  </properties>
+
+  <build>
+    <pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>2.3.2-SNAPSHOT</version>
+			</plugin>
+		</plugins>
+    </pluginManagement>
+	<sourceDirectory>src</sourceDirectory>
+	<directory>target</directory>
+
+    <plugins>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-compiler-plugin</artifactId>
+			<version>2.3.2</version>
+			<configuration>
+				<source>1.6</source>
+				<target>1.6</target>
+			</configuration>
+		</plugin>
+
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-jar-plugin</artifactId>
+			<version>2.3.1</version>
+			<configuration>
+				<archive>
+					<manifest>
+					<mainClass>net.rim.tumbler.WidgetPackager</mainClass>
+					</manifest>
+					<manifestEntries>
+						<Implementation-Vendor>Research In Motion</Implementation-Vendor>
+						<Implementation-Version>${product.version}		</Implementation-Version>
+					</manifestEntries>
+				</archive>
+			</configuration>
+		</plugin>
+    </plugins>
+	
+    <resources>
+      <resource>
+			<targetPath>net/rim/tumbler/log/resources</targetPath>
+			<directory>src/net/rim/tumbler/log/resources</directory>
+			<includes>
+				<include>MessageBundle_en_CA.properties</include>
+			</includes>
+      </resource>
+    </resources>
+
+  </build>
+  <reporting>
+    <plugins>
+        <plugin>
+			<groupId>org.codehaus.mojo</groupId>
+			<artifactId>findbugs-maven-plugin</artifactId>
+			<version>2.3.2-SNAPSHOT</version>
+			<configuration>                
+                <threshold>Normal</threshold>
+                <xmlOutput>true</xmlOutput>
+                <findbugsXmlOutput>true</findbugsXmlOutput>
+                <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
+            </configuration>
+        </plugin>
+    </plugins>
+  </reporting>
+
+</project>

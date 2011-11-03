@@ -17,9 +17,12 @@ package net.rim.tumbler.signing;
 
 import java.io.File;
 import java.io.IOException;
+
 import net.rim.tumbler.exception.PackageException;
 import net.rim.tumbler.file.FileManager;
-import net.rim.tumbler.processbuffer.*;
+import net.rim.tumbler.processbuffer.ErrorBuffer;
+import net.rim.tumbler.processbuffer.ExitBuffer;
+import net.rim.tumbler.processbuffer.OutputBuffer;
 import net.rim.tumbler.session.BBWPProperties;
 import net.rim.tumbler.session.SessionManager;
 

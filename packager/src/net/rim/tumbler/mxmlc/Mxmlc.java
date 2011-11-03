@@ -22,14 +22,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
-import com.sun.jmx.trace.Trace;
-
 import net.rim.tumbler.config.WidgetConfig;
+import net.rim.tumbler.exception.PackageException;
 import net.rim.tumbler.file.FileManager;
-import net.rim.tumbler.processbuffer.*;
+import net.rim.tumbler.processbuffer.ErrorBuffer;
+import net.rim.tumbler.processbuffer.ExitBuffer;
+import net.rim.tumbler.processbuffer.OutputBuffer;
 import net.rim.tumbler.session.BBWPProperties;
 import net.rim.tumbler.session.SessionManager;
-import net.rim.tumbler.exception.PackageException;
 
 public class Mxmlc {
     private static final String TEMPLATE_MAIN_CLASS_FILE = "WebWorksAppTemplate.as";

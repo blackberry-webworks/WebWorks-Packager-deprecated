@@ -234,10 +234,6 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
                 _configValues.put( "accessList", accessList );
             }
 
-            // TODO don't know what extensions will look like, just put in an
-            // empty array for now
-            _configValues.put( "widgetExtensions", new JSONArray() );
-
             _buffer.append( _configValues.toString() );
             _buffer.append( ";\n\n" );
             _buffer.append( "module.exports = _self;" );

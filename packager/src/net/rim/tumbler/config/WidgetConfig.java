@@ -107,13 +107,6 @@ public class WidgetConfig {
     private Hashtable< WidgetAccess, Vector< WidgetFeature >> _accessTable;
     private Vector< String > _extensionClasses;
 
-    // Cache fields
-    private Boolean _cacheEnabled;
-    private Boolean _aggressivelyCaching;
-    private Integer _aggressiveCacheAge;
-    private Integer _maxCacheable;
-    private Integer _maxCacheSize; // Total cache size
-
     // Auto-Startup Fields
     private boolean _runOnStartup;
     private boolean _allowInvokeParams;
@@ -139,12 +132,6 @@ public class WidgetConfig {
         _transitionType = null;
         _transitionDuration = -1;
         _transitionDirection = null;
-
-        _cacheEnabled = null;
-        _aggressivelyCaching = null;
-        _aggressiveCacheAge = null;
-        _maxCacheable = null;
-        _maxCacheSize = null;
 
         _runOnStartup = false;
         _allowInvokeParams = false;
@@ -566,66 +553,6 @@ public class WidgetConfig {
 
     public Vector< String > getExtensionClasses() {
         return _extensionClasses;
-    }
-
-    // Cache field functions
-
-    public Boolean isCacheEnabled() {
-        return _cacheEnabled;
-    }
-
-    public void setCacheEnabled( boolean inputValue ) {
-        _cacheEnabled = inputValue;
-    }
-
-    public Boolean isAggressiveCacheEnabled() {
-        return _aggressivelyCaching;
-    }
-
-    private void setAggressiveCache( boolean inputValue ) {
-        _aggressivelyCaching = inputValue;
-    }
-
-    public Integer getAggressiveCacheAge() {
-        return _aggressiveCacheAge;
-    }
-
-    public void setAggressiveCacheAge( int inputValue ) {
-        // Enable aggressive cache flag if the value is above 0
-        if( inputValue > 0 ) {
-            setAggressiveCache( true );
-        } else if( inputValue == -1 ) {
-            setAggressiveCache( false );
-        }
-
-        // Max value is 30 days
-        if( inputValue <= 2592000 ) {
-            _aggressiveCacheAge = inputValue;
-        }
-    }
-
-    public Integer getMaxCacheSize() {
-        return _maxCacheSize;
-    }
-
-    public void setMaxCacheSize( int inputValue ) {
-        // Min value of 0, max value of 2048 KB
-        if( inputValue >= 0 && inputValue <= ( 2048 * 1024 ) ) {
-            _maxCacheSize = inputValue;
-        } else if( inputValue > 2048 * 1024 ) {
-            _maxCacheSize = 2048 * 1024;
-        }
-    }
-
-    public Integer getMaxCacheItemSize() {
-        return _maxCacheable;
-    }
-
-    public void setMaxCacheItemSize( int inputValue ) {
-        // -1 is a valid value
-        if( inputValue >= -1 ) {
-            _maxCacheable = inputValue;
-        }
     }
 
     // Auto-Startup Accessors and Mutators

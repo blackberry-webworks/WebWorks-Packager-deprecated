@@ -55,6 +55,8 @@ public class SerializerTest {
     private static SessionManager _session = _context.mock( SessionManager.class );;
     
     private static final String TLD = "$$ac$$ad$$ae$$aero$$af$$ag$$ai$$al$$am$$an$$ao$$aq$$ar$$arpa$$as$$asia$$at$$au$$aw$$ax$$az$$ba$$bb$$bd$$be$$bf$$bg$$bh$$bi$$biz$$bj$$bm$$bn$$bo$$br$$bs$$bt$$bv$$bw$$by$$bz$$ca$$cat$$cc$$cd$$cf$$cg$$ch$$ci$$ck$$cl$$cm$$cn$$co$$com$$coop$$cr$$cu$$cv$$cx$$cy$$cz$$de$$dj$$dk$$dm$$do$$dz$$ec$$edu$$ee$$eg$$er$$es$$et$$eu$$fi$$fj$$fk$$fm$$fo$$fr$$ga$$gb$$gd$$ge$$gf$$gg$$gh$$gi$$gl$$gm$$gn$$gov$$gp$$gq$$gr$$gs$$gt$$gu$$gw$$gy$$hk$$hm$$hn$$hr$$ht$$hu$$id$$ie$$il$$im$$in$$info$$int$$io$$iq$$ir$$is$$it$$je$$jm$$jo$$jobs$$jp$$ke$$kg$$kh$$ki$$km$$kn$$kp$$kr$$kw$$ky$$kz$$la$$lb$$lc$$li$$lk$$lr$$ls$$lt$$lu$$lv$$ly$$ma$$mc$$md$$me$$mg$$mh$$mil$$mk$$ml$$mm$$mn$$mo$$mobi$$mp$$mq$$mr$$ms$$mt$$mu$$museum$$mv$$mw$$mx$$my$$mz$$na$$name$$nc$$ne$$net$$nf$$ng$$ni$$nl$$no$$np$$nr$$nu$$nz$$om$$org$$pa$$pe$$pf$$pg$$ph$$pk$$pl$$pm$$pn$$pr$$pro$$ps$$pt$$pw$$py$$qa$$re$$ro$$rs$$ru$$rw$$sa$$sb$$sc$$sd$$se$$sg$$sh$$si$$sj$$sk$$sl$$sm$$sn$$so$$sr$$st$$su$$sv$$sy$$sz$$tc$$td$$tel$$tf$$tg$$th$$tj$$tk$$tl$$tm$$tn$$to$$tp$$tr$$travel$$tt$$tv$$tw$$tz$$ua$$ug$$uk$$us$$uy$$uz$$va$$vc$$ve$$vg$$vi$$vn$$vu$$wf$$ws$$xn--0zwm56d$$xn--11b5bs3a9aj6g$$xn--80akhbyknj4f$$xn--9t4b11yi5a$$xn--deba0ad$$xn--g6w251d$$xn--hgbk6aj7f53bba$$xn--hlcj6aya9esc7a$$xn--jxalpdlp$$xn--kgbechtv$$xn--zckzah$$ye$$yt$$yu$$za$$zm$$zw$$";
+    private static final boolean DEBUG_ENABLED = false;
+    private static final boolean VERBOSE = false;    
     
     private static Hashtable< WidgetAccess, Vector< WidgetFeature >> getTestAccessTable() throws Exception {
         Hashtable< WidgetAccess, Vector< WidgetFeature >> accessTable = new Hashtable< WidgetAccess, Vector< WidgetFeature >>();
@@ -85,8 +87,8 @@ public class SerializerTest {
         _context.checking( new Expectations() {
             {
                 allowing( _session ).getTLD(); will( returnValue( TLD ) );
-                allowing( _session ).debugMode(); will( returnValue( true ) );
-                allowing( _session ).isVerbose(); will( returnValue( false ) );
+                allowing( _session ).debugMode(); will( returnValue( DEBUG_ENABLED ) );
+                allowing( _session ).isVerbose(); will( returnValue( VERBOSE ) );
             }
         } );
 
@@ -102,38 +104,52 @@ public class SerializerTest {
     }
 
     @Test
-    public void testSerializeBasic() throws Exception {
+    public void testSerializeString() throws Exception {
+        final String[] values = {
+                "1.0.0.0",                      // version
+                "MyApp",                        // id
+                "My App",                       // name
+                "This is a very powerful app!", // description
+                "default.html",                 // content
+                "config.xml",                   // config XML
+                "exit",                         // back button behavior
+                "",                             // content type
+                "utf-8",                        // content charset
+                "Apache 2.0",                   // license
+                "http://www.apache.org",        // license URL
+                "John O' Conner",               // author
+                "john@helloworld.com",          // author email
+                "http://john.helloworld.com",   // author url
+                "Copyright (c) 2011 John O'Connor", // copyright
+                "#000000",                      // loading screen color
+                "images/backgroundImg.jpg",     // background image
+                "images/foregroundImg.jpg",     // foreground image
+                "background.html",              // background source
+                "foreground.html"               // foreground source
+        };
+        int i = 0;
+        
         _widgetConfig = new WidgetConfig();
-        _widgetConfig.setName( "My App" );
-        _widgetConfig.setVersion( "1.0.0.0" );
-        _widgetConfig.setID( "MyApp" );
-        _widgetConfig.setDescription( "This is a very powerful app!" );
-        _widgetConfig.setContent( "default.html" );
-        _widgetConfig.setConfigXML( "config.xml" );
-        _widgetConfig.setContentType( "" );
-        _widgetConfig.setContentCharSet( "utf-8" );
-        _widgetConfig.setLicense( "Apache 2.0" );
-        _widgetConfig.setLicenseURL( "http://www.apache.org" );
-        _widgetConfig.setAuthor( "John O' Conner" );
-        _widgetConfig.setCopyright( "Copyright (c) 2011 John O'Connor" );        
-        _widgetConfig.setAuthorEmail( "john@helloworld.com" );
-        _widgetConfig.setAuthorURL( "http://john.helloworld.com" );
-        _widgetConfig.setLoadingScreenColour( "#000000" );
-        _widgetConfig.setBackgroundImage( "images/backgroundImg.jpg" );
-        _widgetConfig.setForegroundImage( "images/foregroundImg.jpg" );
-        _widgetConfig.setMultiAccess( true );
-        _widgetConfig.setNavigationMode( true );
-        _widgetConfig.setFirstPageLoad( true );
-        _widgetConfig.setLocalPageLoad( true );
-        _widgetConfig.setRemotePageLoad( true );
-        _widgetConfig.setCacheEnabled( true );
-        _widgetConfig.setAggressiveCacheAge( 300000 );
-        _widgetConfig.setMaxCacheSize( new Integer( 1024  ) );
-        _widgetConfig.setMaxCacheItemSize( new Integer( 1024  ) );
-        _widgetConfig.setAllowInvokeParams( true );
-        _widgetConfig.setForegroundSource( "foreground.html" );
-        _widgetConfig.setBackgroundSource( "background.html" );
-        _widgetConfig.setStartup( true );
+        _widgetConfig.setVersion( values[i++] );
+        _widgetConfig.setID( values[i++] );
+        _widgetConfig.setName( values[i++] );
+        _widgetConfig.setDescription( values[i++] );
+        _widgetConfig.setContent( values[i++] );
+        _widgetConfig.setConfigXML( values[i++] );
+        _widgetConfig.setBackButtonBehaviour( values[i++] );
+        _widgetConfig.setContentType( values[i++] );
+        _widgetConfig.setContentCharSet( values[i++] );
+        _widgetConfig.setLicense( values[i++] );
+        _widgetConfig.setLicenseURL( values[i++] );
+        _widgetConfig.setAuthor( values[i++] );        
+        _widgetConfig.setAuthorEmail( values[i++] );
+        _widgetConfig.setAuthorURL( values[i++] );
+        _widgetConfig.setCopyright( values[i++] );        
+        _widgetConfig.setLoadingScreenColour( values[i++] );
+        _widgetConfig.setBackgroundImage( values[i++] );
+        _widgetConfig.setForegroundImage( values[i++] );
+        _widgetConfig.setBackgroundSource( values[i++] );        
+        _widgetConfig.setForegroundSource( values[i++] );        
 
         _serializer = new WidgetConfig_v1Serializer( _widgetConfig, null );
         _serializer.serialize();
@@ -141,32 +157,45 @@ public class SerializerTest {
         JSONObject configJSON = _serializer.getConfigJSONObject();
         Assert.assertNotNull( configJSON );
 
-        Assert.assertEquals( "My App", configJSON.getString( "name" ) );
-        Assert.assertEquals( "1.0.0.0", configJSON.getString( "version" ) );
-        Assert.assertEquals( "MyApp", configJSON.getString( "id" ) );
-        Assert.assertEquals( "This is a very powerful app!", configJSON.getString( "description" ) );
-        Assert.assertEquals( "John O' Conner", configJSON.getString( "author" ) );
-        Assert.assertEquals( "http://john.helloworld.com", configJSON.getString( "authorURL" ) );
-        Assert.assertEquals( "john@helloworld.com", configJSON.getString( "authorEmail" ) );
-        Assert.assertEquals( "Copyright (c) 2011 John O'Connor", configJSON.getString( "copyright" ) );
-        Assert.assertEquals( "", configJSON.getString( "contentType" ) );
-        Assert.assertEquals( "utf-8", configJSON.getString( "contentCharset" ) );
-        Assert.assertEquals( "Apache 2.0", configJSON.getString( "license" ) );
-        Assert.assertEquals( "http://www.apache.org", configJSON.getString( "licenseURL" ) );
-        Assert.assertEquals( "config.xml", configJSON.getString( "configXML" ) );
-        Assert.assertEquals( "#000000", configJSON.getString( "loadingScreenColor" ) );
-        Assert.assertEquals( "images/foregroundImg.jpg", configJSON.getString( "foregroundImage" ) );
-        Assert.assertEquals( "images/backgroundImg.jpg", configJSON.getString( "backgroundImage" ) );
-        Assert.assertEquals( "background.html", configJSON.getString( "backgroundSource" ) );
-        Assert.assertEquals( "foreground.html", configJSON.getString( "foregroundSource" ) );
-        Assert.assertTrue( configJSON.getBoolean( "hasMultiAccess" ) );
-        Assert.assertEquals( "default.html", configJSON.getString( "content" ) );
-        Assert.assertTrue( configJSON.getBoolean( "allowInvokeParams" ) );
-        Assert.assertTrue( configJSON.getBoolean( "runOnStartUp" ) );
-        Assert.assertEquals( 300000, configJSON.getInt( "aggressiveCacheAge" ) );
-        Assert.assertEquals( 1024, configJSON.getInt( "maxCacheSizeTotal" ) );
-        Assert.assertEquals( 1024, configJSON.getInt( "maxCacheSizeItem" ) );
-        Assert.assertTrue( configJSON.getBoolean( "debugEnabled" ) );
+        for( i = 0; i < values.length; i++ ) {
+            Assert.assertEquals( values[ i ],
+                    configJSON.getString( WidgetConfig_v1Serializer.getStringPropKeys()[ i ] ) );
+        }
+    }
+    
+    @Test
+    public void testSerializeBoolean() throws Exception {
+        final boolean[] values = {
+                true,   // allow multiple access
+                true,   // on first launch
+                true,   // on local page load
+                true,   // on remote page load
+                true,   // allow invoke params
+                true,   // run on start-up
+                DEBUG_ENABLED                
+        };
+        int i = 0;
+        
+        _widgetConfig = new WidgetConfig();
+        _widgetConfig.setMultiAccess( values[i++] );
+        _widgetConfig.setFirstPageLoad( values[i++] );
+        _widgetConfig.setLocalPageLoad( values[i++] );
+        _widgetConfig.setRemotePageLoad( values[i++] );
+        _widgetConfig.setAllowInvokeParams( new Boolean( values[i++] ) );
+        _widgetConfig.setStartup( new Boolean( values[i++] ) );
+        
+        _serializer = new WidgetConfig_v1Serializer( _widgetConfig, null );
+        _serializer.serialize();
+
+        JSONObject configJSON = _serializer.getConfigJSONObject();
+        Assert.assertNotNull( configJSON );
+
+        for( i = 0; i < values.length; i++ ) {
+            if( values[ i ] ) {
+                Assert.assertEquals( values[ i ],
+                        configJSON.getBoolean( WidgetConfig_v1Serializer.getBooleanPropKeys()[ i ] ) );
+            }
+        }
     }
     
     @Test
@@ -206,6 +235,18 @@ public class SerializerTest {
                 Assert.fail( "customHeaders contains unknown header: " + key );
             }
         }
+    }
+    
+    @Test
+    public void testSerializeNavMode() throws Exception {
+        _widgetConfig = new WidgetConfig();
+        _widgetConfig.setNavigationMode( true );
+
+        _serializer = new WidgetConfig_v1Serializer( _widgetConfig, null );
+        _serializer.serialize();
+
+        JSONObject configJSON = _serializer.getConfigJSONObject();
+        Assert.assertEquals( "focus", configJSON.getString( "navigationMode" ) );
     }
     
     @Test

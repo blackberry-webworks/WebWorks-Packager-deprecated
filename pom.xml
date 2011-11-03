@@ -11,26 +11,15 @@
 	</modules>
 	
 	<dependencies>
-		<!--
-		<dependency>
-			<groupId>rim.net.BBXwebworks</groupId>
-			<artifactId>packager</artifactId>
-			<version>1.0.0.0</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		-->
 	</dependencies>
-	
-	
-	<build>	
-		<!-- unzip framework -->
+		
+	<build>
 		<plugins>
+			<!-- unzip framework -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
-					 <!-- Unzip the dependency -->
 					<execution>
 						<id>unpack-framework</id>
 						<phase>generate-resources</phase>
@@ -51,31 +40,10 @@
 				  </execution>
 				</executions>
 			</plugin>
-			
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.5</version>
-				<executions>
-					  <execution>
-							<id>copy-resources</id>
-							<phase>validate</phase>
-							<goals>
-								<goal>copy-resources</goal>
-							</goals>
-							<configuration>
-							<outputDirectory>${basedir}/target/dependency</outputDirectory>
-							<resources>          
-								<resource>
-									<directory>packager/src/resources</directory>
-									<filtering>true</filtering>
-								</resource>
-							</resources>              
-						</configuration>            
-					</execution>
-				</executions>
-			</plugin>
 
+
+			<!-- copy bin folder -->
+			<!-- copy bbwp executables -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -88,18 +56,37 @@
 								<goal>copy-resources</goal>
 							</goals>
 							<configuration>
-                                                            <outputDirectory>${basedir}/target/dependency/bin</outputDirectory>
-							<resources>          
-								<resource>
-									<directory>packager/bin</directory>
-									<filtering>true</filtering>
-								</resource>
-							</resources>              
+								<outputDirectory>${basedir}/target/dependency/bin</outputDirectory>
+								<resources>          
+									<resource>
+										<directory>packager/bin</directory>
+										<filtering>true</filtering>
+									</resource>
+								</resources>              
 						</configuration>            
+					</execution>
+					<execution>
+						<id>copy-resources</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/dependency</outputDirectory>
+							<resources>
+								<resource>
+									<directory>packager/src/resources</directory>
+									<includes>
+										<include>bbwp*</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-
+			
+			<!-- copy bbwp.jar from packager -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -118,7 +105,7 @@
 									<version>1.0.0.0</version>
 									<type>jar</type>
 									<overWrite>true</overWrite>
-                                                                        <outputDirectory>target/dependency/bin</outputDirectory>
+										<outputDirectory>target/dependency/bin</outputDirectory>
 									<destFileName>bbwp.jar</destFileName>
 								</artifactItem>
 							</artifactItems>
@@ -126,36 +113,8 @@
 					</execution>
 				</executions>
 			</plugin>			
-
-			<!--
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.5</version>
-				<executions>
-					<execution>
-						<id>copy-archive</id>
-						
-						<phase>package</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory></outputDirectory>
-							<resources>
-								<resource>
-									<directory>${basedir}/target</directory>
-									<includes>
-										<include>*.zip</include>
-									</includes>									
-								</resource>
-							</resources>              
-						</configuration>            
-					</execution>
-				</executions>
-			</plugin>
-			--> 
-
+			
+			<!-- generate final zip -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>

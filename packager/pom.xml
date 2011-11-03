@@ -10,8 +10,22 @@
   <properties>
 		<product.version>1.0.0.0</product.version>
   </properties>
+  
+  <dependencies>
+		<dependency>
+			<groupId>org.jmock</groupId>
+			<artifactId>jmock-junit4</artifactId>
+			<version>2.5.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jmock</groupId>
+			<artifactId>jmock-legacy</artifactId>
+			<version>2.5.1</version>
+		</dependency>
+	</dependencies>
 
   <build>
+	<testSourceDirectory>../packager.test/src</testSourceDirectory>
     <pluginManagement>
 		<plugins>
 			<plugin>

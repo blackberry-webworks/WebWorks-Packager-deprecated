@@ -164,19 +164,6 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
             _configValues.put( "onRemotePageLoad", _widgetConfig.getRemotePageLoad() );
             _configValues.put( "onLocalPageLoad", _widgetConfig.getLocalPageLoad() );
 
-            // add TransitionEffect configuration
-//            if( _widgetConfig.getTransitionType() != null ) {
-//                _configValues.put( "transitionType", new JSExpression( _widgetConfig.getTransitionType() ) );
-//
-//                if( _widgetConfig.getTransitionDuration() >= 0 ) {
-//                    _configValues.put( "transitionDuration", _widgetConfig.getTransitionDuration() );
-//                }
-//
-//                if( _widgetConfig.getTransitionDirection() != null ) {
-//                    _configValues.put( "transitionDirection", new JSExpression( _widgetConfig.getTransitionDirection() ) );
-//                }
-//            }
-
             // add cache options
             if( _widgetConfig.isCacheEnabled() != null ) {
                 _configValues.put( "disableAllCache", true );

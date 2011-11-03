@@ -128,9 +128,6 @@ public class SerializerTest {
                 allowing( _widgetConfig ).getFirstPageLoad(); will( returnValue( true ) );
                 allowing( _widgetConfig ).getLocalPageLoad(); will( returnValue( true ) );
                 allowing( _widgetConfig ).getRemotePageLoad(); will( returnValue( true ) );
-//                allowing( _widgetConfig ).getTransitionType(); will( returnValue( "TransitionConstants.TRANSITION_FADEIN" ) );
-//                allowing( _widgetConfig ).getTransitionDuration(); will( returnValue( 5000 ) );
-//                allowing( _widgetConfig ).getTransitionDirection(); will( returnValue( "TransitionConstants.DIRECTION_RIGHT" ) );
                 allowing( _widgetConfig ).isCacheEnabled(); will( returnValue( new Boolean( true ) ) );
                 allowing( _widgetConfig ).getAggressiveCacheAge(); will( returnValue( new Integer( 300000 ) ) );
                 allowing( _widgetConfig ).getMaxCacheSize(); will( returnValue( new Integer( 1024 ) ) );
@@ -173,9 +170,6 @@ public class SerializerTest {
         Assert.assertTrue( configJSON.getBoolean( "debugEnabled" ) );
         Assert.assertTrue( configJSON.getBoolean( "allowInvokeParams" ) );
         Assert.assertTrue( configJSON.getBoolean( "runOnStartUp" ) );
-//        Assert.assertEquals( 5000, configJSON.getInt( "transitionDuration" ) );
-//        Assert.assertEquals( "TransitionConstants.TRANSITION_FADEIN", configJSON.getString( "transitionType" ) );
-//        Assert.assertEquals( "TransitionConstants.DIRECTION_RIGHT", configJSON.getString( "transitionDirection" ) );
         Assert.assertEquals( 300000, configJSON.getInt( "aggressiveCacheAge" ) );
         Assert.assertEquals( 1024, configJSON.getInt( "maxCacheSizeTotal" ) );
         Assert.assertEquals( 1024, configJSON.getInt( "maxCacheSizeItem" ) );
@@ -241,7 +235,6 @@ public class SerializerTest {
                 allowing( _widgetConfig ).getFirstPageLoad(); will( returnValue( false ) );
                 allowing( _widgetConfig ).getLocalPageLoad(); will( returnValue( false ) );
                 allowing( _widgetConfig ).getRemotePageLoad(); will( returnValue( false ) );
-//                allowing( _widgetConfig ).getTransitionType(); will( returnValue( null ) );
                 allowing( _widgetConfig ).isCacheEnabled(); will( returnValue( null ) );
                 allowing( _widgetConfig ).getAggressiveCacheAge(); will( returnValue( null ) );
                 allowing( _widgetConfig ).getMaxCacheSize(); will( returnValue( null ) );

@@ -1,5 +1,4 @@
 <project>
-
   <groupId>net.rim.BBXwebworks</groupId>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>packager</artifactId>
@@ -12,6 +11,12 @@
   </properties>
   
   <dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.1</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.jmock</groupId>
 			<artifactId>jmock-junit4</artifactId>
@@ -60,24 +65,14 @@
 					</manifest>
 					<manifestEntries>
 						<Implementation-Vendor>Research In Motion</Implementation-Vendor>
-						<Implementation-Version>${product.version}		</Implementation-Version>
+						<Implementation-Version>${product.version}</Implementation-Version>
 					</manifestEntries>
 				</archive>
 			</configuration>
 		</plugin>
     </plugins>
-	
-    <resources>
-      <resource>
-			<targetPath>net/rim/tumbler/log/resources</targetPath>
-			<directory>src/net/rim/tumbler/log/resources</directory>
-			<includes>
-				<include>MessageBundle_en_CA.properties</include>
-			</includes>
-      </resource>
-    </resources>
-
   </build>
+  
   <reporting>
     <plugins>
         <plugin>
@@ -93,5 +88,4 @@
         </plugin>
     </plugins>
   </reporting>
-
 </project>

@@ -70,8 +70,8 @@ public class SigningSupport {
 
     public static void signBar( BBWPProperties bbwpProperties ) throws IOException, PackageException {
         SessionManager sessionManager = SessionManager.getInstance();
-        String signer = bbwpProperties.getTabletSDK() + File.separator + "bin" + File.separator
-                + FileManager.selectOnPlatform( "blackberry-signer.bat", "blackberry-signer" );
+        String signer = "";//bbwpProperties.getTabletSDK() + File.separator + "bin" + File.separator
+                //+ FileManager.selectOnPlatform( "blackberry-signer.bat", "blackberry-signer" );
 
         String barFullname = sessionManager.getOutputFilepath();
         File barFile = new File( barFullname );

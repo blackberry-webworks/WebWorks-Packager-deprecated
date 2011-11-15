@@ -19,9 +19,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.MessageDigest;
-
-import net.rim.tumbler.session.SessionManager;
 
 public class TemplateFile {
     protected File _sourceFile;
@@ -37,15 +34,11 @@ public class TemplateFile {
         byte b[] = getFromFile();
         String content = new String( b );
 
-        return refactor( content );
+        return content;
     }
 
     public String getName() {
         return _relativeLocation;
-    }
-
-    public static String refactor( String original ) {
-        return original.replace( TemplateWrapper.DEVICE_PACKAGE, genPackageName( SessionManager.getInstance().getArchiveName() ) );
     }
 
     private byte[] getFromFile() throws IOException {
@@ -80,30 +73,5 @@ public class TemplateFile {
         // Close the input stream and return bytes
         is.close();
         return bytes;
-    }
-
-    private static String genPackageName( String widgetName ) {
-        String packageHash;
-
-        try {
-            MessageDigest md;
-
-            md = MessageDigest.getInstance( "MD5" );
-            md.reset();
-            md.update( widgetName.getBytes() );
-            byte[] byteArray = md.digest();
-
-            StringBuffer hexString = new StringBuffer();
-            for( int i = 0; i < byteArray.length; i++ ) {
-                hexString.append( Integer.toHexString( 0xFF & byteArray[ i ] ) );
-            }
-
-            packageHash = hexString.toString();
-
-        } catch( Exception e ) {
-            packageHash = widgetName;
-        }
-
-        return TemplateWrapper.DEVICE_PACKAGE + packageHash + "package";
     }
 }

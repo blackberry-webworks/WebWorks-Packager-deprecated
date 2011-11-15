@@ -15,9 +15,7 @@
  */
 package net.rim.tumbler;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -45,16 +43,10 @@ import net.rim.tumbler.xml.XMLParser;
 
 public class WidgetPackager {
 
-    private static final String[] STANDARD_OUTPUTS = new String[] { ".cod", ".alx", ".cso", ".csl" };
-    private static final String[] OTA_OUTPUTS = new String[] { ".cod", ".jad" };
-
-    // TODO: retrieve from logger
-    public static final String BLACKBERRY_WIDGET_PORTAL_URL = "http://www.blackberry.com/developers/widget/";
     public static final String PROPERTIES_FILE = "bbwp.properties";
     public static final String SIGNATURE_KEY_FILE = "sigtool.csk";
 
-    // TODO may need to put it in a different location
-    private static final String AUTOGEN_FILE = "config/user.js";
+    private static final String AUTOGEN_FILE = "lib/config/user.js";
 
     private static final int NO_ERROR_RETURN_CODE = 0;
     private static final int PACKAGE_ERROR_RCODE = 1;
@@ -115,47 +107,12 @@ public class WidgetPackager {
                 entryClassTable = copyExtensions( bbwpProperties, config );
             }
 
-            // Set 3rd party extension classes
-            if( !SessionManager.getInstance().isPlayBook() ) {
-                config.setExtensionClasses( fileManager.getExtensionClasses() );
-            }
-
             // create autogen file
             WidgetConfigSerializer wcs = new WidgetConfig_v1Serializer( config, entryClassTable );
             byte[] autogenFile = wcs.serialize();
             fileManager.writeToSource( autogenFile, AUTOGEN_FILE );
 
-            // create jdw/jdp files
-//            if( !SessionManager.getInstance().isPlayBook() ) {
-//                fileManager.generateProjectFiles( sessionManager.getSourceFolder(), sessionManager.getArchiveName(),
-//                        config.getName(), config.getVersion(), config.getAuthor(), config.getContent(),
-//                        config.getBackgroundSource(), config.isStartupEnabled(), config.getIconSrc(), config.getHoverIconSrc(),
-//                        fileManager.getFiles(), bbwpProperties.getImports() );
-//            }
-
-            // run mxmlc to compile ActionScript into SWF
 //            Logger.logMessage( LogType.INFO, "PROGRESS_COMPILING" );
-//            if( SessionManager.getInstance().isPlayBook() ) {
-//                Mxmlc mxmlc = new Mxmlc( bbwpProperties, config );
-//
-//                // just for demo purposes, we hard code the source file path
-//                mxmlc.run();
-//
-//                // *** just for demo purposes, we HARD CODE THE SOURCE PATH ***
-//                Logger.logMessage( LogType.INFO, "PROGRESS_PACKAGING" );
-//                AirPackager packager = new AirPackager( bbwpProperties, config );
-//                int ret = packager.run();
-//                if( ret == 0 ) {
-//                    Logger.logMessage( LogType.INFO, "PACKAGING_COMPLETE" );
-//                } else {
-//                    System.exit( ret );
-//                }
-//            }
-
-            // generate ALX
-//            if( !SessionManager.getInstance().isPlayBook() ) {
-//                generateAlxFile( config );
-//            }
 
             // TODO signing needs to be uncommented later
 //            if( ENABLE_SIGNING && sessionManager.requireSigning() ) {
@@ -177,17 +134,15 @@ public class WidgetPackager {
 //            }
 
             // clean/prep output folders
-            fileManager.cleanOutput();
+            fileManager.cleanOutput();            
 
-            // copy output files
-            if( !SessionManager.getInstance().isPlayBook() ) {
-                Logger.logMessage( LogType.INFO, "PROGRESS_GEN_OUTPUT" );
-                fileManager.copyOutputsFromSource( STANDARD_OUTPUTS, OTA_OUTPUTS );
-            }
+            Logger.logMessage( LogType.INFO, "PROGRESS_GEN_OUTPUT" );
+            
+            // create output zip file
+            fileManager.createOutputZip();
 
             // clean source (if necessary)
             if( !sessionManager.requireSource() ) {
-                fileManager.copyOutputsFromSource();                
                 fileManager.cleanSource();
             }
 
@@ -215,70 +170,6 @@ public class WidgetPackager {
 
     public static Object[] getVersion() {
         return new Object[] { new WidgetPackager().getClass().getPackage().getImplementationVersion() };
-    }
-
-    private static void signCod( SessionManager sessionManager ) throws Exception {
-        Process signingProcess;
-        long lastModified = 0;
-        String codFullname = sessionManager.getSourceFolder() + File.separator + sessionManager.getArchiveName() + ".cod";
-
-        try {
-            lastModified = ( new File( codFullname ) ).lastModified();
-            String password = sessionManager.getPassword();
-            File cwd = new File( sessionManager.getBBWPJarFolder() );
-            String cmdline = "java -jar SignatureTool.jar -a -c " + ( password.length() == 0 ? "" : "-p " + password + " " )
-                    + "\"" + sessionManager.getSourceFolder() + File.separator + sessionManager.getArchiveName() + ".cod" + "\"";
-            signingProcess = Runtime.getRuntime().exec( cmdline, null, cwd );
-        } catch( IOException ex ) {
-            throw ex;
-        }
-
-        try {
-            int signingResult = signingProcess.waitFor();
-
-            // Check whether signing is successful
-            if( signingResult != 0 ) {
-                throw new PackageException( "EXCEPTION_SIGNING_FAILED" );
-            }
-
-            long newModified = ( new File( codFullname ) ).lastModified();
-            if( newModified == lastModified ) {
-                throw new PackageException( "EXCEPTION_SIGNING_FAILED" );
-            }
-        } catch( InterruptedException e ) {
-            throw e;
-        }
-    }
-
-    // Generate a .alx file
-    private static void generateAlxFile( WidgetConfig widgetConfig ) throws IOException {
-        String EOL = System.getProperty( "line.separator" );
-        String fileName = SessionManager.getInstance().getSourceFolder() + File.separator
-                + SessionManager.getInstance().getArchiveName() + ".alx";
-        BufferedWriter writer = new BufferedWriter( new FileWriter( fileName ) );
-        writer.write( "<loader version=\"1.0\" >" + EOL );
-        writer.write( "<application id=\"" + SessionManager.getInstance().getArchiveName() + "\">" + EOL );
-        writer.write( "<name>" + widgetConfig.getName() + "</name>" + EOL );
-        if( widgetConfig.getDescription() != null ) {
-            writer.write( "<description>" + widgetConfig.getDescription() + "</description>" + EOL );
-        }
-        writer.write( "<version>" + widgetConfig.getVersion() + "</version>" + EOL );
-        if( widgetConfig.getAuthor() != null ) {
-            writer.write( "<vendor>" + widgetConfig.getAuthor() + "</vendor>" + EOL );
-        }
-        if( widgetConfig.getCopyright() != null ) {
-            writer.write( "<copyright>" + widgetConfig.getCopyright() + "</copyright>" + EOL );
-        }
-        writer.write( "<fileset Java=\"1.45\">" + EOL );
-        writer.write( "<directory>" );
-        writer.write( "</directory>" + EOL );
-        writer.write( "<files>" );
-        writer.write( SessionManager.getInstance().getArchiveName() + ".cod" );
-        writer.write( "</files>" + EOL );
-        writer.write( "</fileset>" + EOL );
-        writer.write( "</application>" + EOL );
-        writer.write( "</loader>" + EOL );
-        writer.close();
     }
 
     /**

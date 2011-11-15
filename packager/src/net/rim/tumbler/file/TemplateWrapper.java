@@ -24,25 +24,14 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
-import net.rim.tumbler.session.BBWPProperties;
-import net.rim.tumbler.session.SessionManager;
-
 public class TemplateWrapper {
 
-    public static final String DEVICE_PACKAGE = "blackberry.web.widget";
-
-    private BBWPProperties _bbwpProperties;
     private Hashtable< String, TemplateFile > _templates;
     private File _root;
 
-    public TemplateWrapper( BBWPProperties bbwpProperties ) {
-        _bbwpProperties = bbwpProperties;
+    public TemplateWrapper( String dir ) {
         _templates = new Hashtable< String, TemplateFile >();
-        if( !SessionManager.getInstance().isPlayBook() ) {
-            _root = new File( _bbwpProperties.getTemplateDir() );
-        } else {
-            _root = new File( _bbwpProperties.getTemplateDir() /*_bbwpProperties.getAirTemplate() + System.getProperty( "file.separator" ) + "src"*/ );
-        }
+        _root = new File( dir );
         initTemplates( _root );
     }
 

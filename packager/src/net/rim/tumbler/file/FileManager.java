@@ -44,8 +44,8 @@ public class FileManager {
 
     public void cleanOutput() {
         File zipFile = getOutputFolderZipFile();
-        
-        if (zipFile.exists()) {
+
+        if( zipFile.exists() ) {
             zipFile.delete();
         }
     }
@@ -97,7 +97,7 @@ public class FileManager {
     }
 
     public void createOutputZip() throws IOException {
-        File outputDir = new File (SessionManager.getInstance().getOutputFolder() );                
+        File outputDir = new File( SessionManager.getInstance().getOutputFolder() );
         File sourceDir = new File( SessionManager.getInstance().getSourceFolder() );
         File zip = getOutputFolderZipFile();
         
@@ -117,21 +117,21 @@ public class FileManager {
         return new File( SessionManager.getInstance().getOutputFolder() + FILE_SEP + zipFileName );
     }
 
-    private static void createZipEntry( File zip, File sourceDir, String parentDir, File f, ZipOutputStream out )
+    private static void createZipEntry( File zip, File sourceDir, String parentDir, File toZip, ZipOutputStream out )
             throws IOException {
-        if( f.isDirectory() ) {
-            File[] files = f.listFiles();
+        if( toZip.isDirectory() ) {
+            File[] files = toZip.listFiles();
 
-            for( File g : files ) {
-                createZipEntry( zip, sourceDir, sourceDir.equals( f ) ? "" : parentDir + FILE_SEP + f.getName(), g, out );
+            for( File f : files ) {
+                createZipEntry( zip, sourceDir, sourceDir.equals( toZip ) ? "" : parentDir + FILE_SEP + toZip.getName(), f, out );
             }
         } else {
-            if( !zip.equals( f ) ) {
+            if( !zip.equals( toZip ) ) {
                 byte[] buf = new byte[ 1024 ];
-                FileInputStream in = new FileInputStream( f );
+                FileInputStream in = new FileInputStream( toZip );
                 int len;
 
-                out.putNextEntry( new ZipEntry( parentDir + FILE_SEP + f.getName() ) );
+                out.putNextEntry( new ZipEntry( parentDir + FILE_SEP + toZip.getName() ) );
 
                 while( ( len = in.read( buf ) ) > 0 ) {
                     out.write( buf, 0, len );

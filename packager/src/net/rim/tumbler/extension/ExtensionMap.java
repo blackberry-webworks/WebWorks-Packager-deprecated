@@ -227,7 +227,7 @@ public class ExtensionMap {
                         // prepended
                         // as-is to the configured pathname.
                         //
-                        String javascriptPrefix = outputFolder + File.separator + "WebWorksApplicationSharedJsRepository0"
+                        String javascriptPrefix = outputFolder + File.separator + "ext"
                                 + File.separator + getEscapedEntryClass( depDescriptor.getEntryClass() ) + File.separator;
 
                         //

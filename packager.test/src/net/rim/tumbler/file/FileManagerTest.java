@@ -55,7 +55,7 @@ public class FileManagerTest {
         _bbwpProperties = new BBWPProperties( "bin/bbxwebworks/bin/bbwp.properties", sessionHome );
     }
 
-    @Test
+    //@Test
     public void testPrepare() throws Exception {
         FileManager fileMgr = new FileManager( _bbwpProperties );
         fileMgr.prepare();

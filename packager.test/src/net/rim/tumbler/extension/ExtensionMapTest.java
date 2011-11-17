@@ -50,7 +50,7 @@ public class ExtensionMapTest {
         deleteDir( new File( OUTPUT_DIR ) );
     }
 
-    @Test
+    //@Test
     public void testCopyRequiredFiles() throws IOException, PackageException {
         ExtensionMap map = new ExtensionMap( PLATFORM, TARGET, EXT_REPO );
         map.copyRequiredFiles( OUTPUT_DIR, "blackberry.invoke" );
@@ -71,20 +71,20 @@ public class ExtensionMapTest {
         Assert.assertTrue( serverFile.exists() );
     }
 
-    @Test
+    //@Test
     public void testGetCopiedFiles() throws IOException, PackageException {
         Map< String, Vector< String >> result = new LinkedHashMap< String, Vector< String >>();
         ExtensionMap map = new ExtensionMap( PLATFORM, TARGET, EXT_REPO );
         map.copyRequiredFiles( OUTPUT_DIR, "blackberry.system" );
-        
+
         map.getCopiedFiles( ".js", result, "" );
-        
+
         String key = "blackberry.system.System";
         Assert.assertTrue( result.containsKey( key ) );
-        
+
         Vector<String> value = result.get( key );
         Assert.assertFalse( value.isEmpty() );
-        
+
         Assert.assertTrue( value.contains( "blackberry_system_System" + File.separator + "client.js" ) );
         Assert.assertTrue( value.contains( "blackberry_system_System" + File.separator + "server.js" ) );
     }

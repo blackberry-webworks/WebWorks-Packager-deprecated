@@ -34,6 +34,7 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
     private StringBuffer _buffer;
     private JSONObject _configValues;
     private WidgetConfig _widgetConfig;
+    private Map<String, Vector<String>> _entryClassTable;
     private static final String[] KEYS_PROP_STRING = { 
         "version",
         "id",
@@ -70,6 +71,7 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
         _buffer = new StringBuffer( "module.exports = " );
         _configValues = new JSONObject();
         _widgetConfig = widgetConfig;
+        _entryClassTable = entryClassTable;
     }
     
     private void serializeStringProperties() throws JSONException {
@@ -188,8 +190,29 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
             if( _widgetConfig.getNavigationMode() ) {
                 _configValues.put( "navigationMode", "focus" );
             }
+            
+            //add widget extensions
+            if (_entryClassTable != null){
+	            JSONArray widgetExtensions = new JSONArray();
+	            for (String entryClass : _entryClassTable.keySet()) {
+	            	JSONObject extension = new JSONObject();
+	                JSONArray requiredJSFiles = new JSONArray();
+	            	
+	                extension.put("class", entryClass);
+	                extension.put("requiredJSFiles", requiredJSFiles);
+	
+	                for (String jsPathname : _entryClassTable.get(entryClass)) {
+	                	requiredJSFiles.put(jsPathname.replace('\\', '/'));
+	                }
+	
+	                widgetExtensions.put(extension);
+	            }
+	            
+	            _configValues.put("widgetExtensions", widgetExtensions);
+            }
 
-            _buffer.append( _configValues.toString() );
+            //Print out JSON data in a nice formatted way
+            _buffer.append( _configValues.toString(4) );
             _buffer.append( ";\n" );
         } catch( JSONException e ) {
             throw new RuntimeException( e );

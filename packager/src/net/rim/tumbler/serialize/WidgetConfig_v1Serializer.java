@@ -104,7 +104,7 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
             }
         }
     }
-	
+    
     private void serializeBooleanProperties() throws JSONException {
         boolean[] propValues = {
                 _widgetConfig.allowMultiAccess(),
@@ -193,22 +193,22 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
             
             //add widget extensions
             if (_entryClassTable != null){
-	            JSONArray widgetExtensions = new JSONArray();
-	            for (String entryClass : _entryClassTable.keySet()) {
-	            	JSONObject extension = new JSONObject();
-	                JSONArray requiredJSFiles = new JSONArray();
-	            	
-	                extension.put("class", entryClass);
-	                extension.put("requiredJSFiles", requiredJSFiles);
-	
-	                for (String jsPathname : _entryClassTable.get(entryClass)) {
-	                	requiredJSFiles.put(jsPathname.replace('\\', '/'));
-	                }
-	
-	                widgetExtensions.put(extension);
-	            }
-	            
-	            _configValues.put("widgetExtensions", widgetExtensions);
+                JSONArray widgetExtensions = new JSONArray();
+                for (String entryClass : _entryClassTable.keySet()) {
+                    JSONObject extension = new JSONObject();
+                    JSONArray requiredJSFiles = new JSONArray();
+                    
+                    extension.put("class", entryClass);
+                    extension.put("requiredJSFiles", requiredJSFiles);
+    
+                    for (String jsPathname : _entryClassTable.get(entryClass)) {
+                        requiredJSFiles.put(jsPathname.replace('\\', '/'));
+                    }
+    
+                    widgetExtensions.put(extension);
+                }
+                
+                _configValues.put("widgetExtensions", widgetExtensions);
             }
 
             //Print out JSON data in a nice formatted way

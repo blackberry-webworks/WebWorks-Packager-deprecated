@@ -6,6 +6,8 @@ import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import junit.framework.Assert;
 
@@ -48,18 +50,6 @@ public class ExtensionMapTest {
         return dir.delete();
     }
 
-    private static File getFile( File dir, String name ) {
-        if( dir != null && dir.exists() ) {
-            for( File file : dir.listFiles() ) {
-                if( file.getName().equals( name ) ) {
-                    return file;
-                }
-            }
-        }
-
-        return null;
-    }
-
     @BeforeClass    
     public static void mockSession() throws Exception {
         // mock SessionManager which is used by FileManager
@@ -84,20 +74,21 @@ public class ExtensionMapTest {
     public void testCopyRequiredFiles() throws IOException, PackageException {
         ExtensionMap map = new ExtensionMap( PLATFORM, TARGET, EXT_REPO );
         map.copyRequiredFiles( SessionManager.getInstance().getSourceFolder(), "blackberry.invoke" );
-
+        
         File outputDir = new File( SessionManager.getInstance().getSourceFolder() );
+        Logger.getLogger( "com.rtse" ).log( Level.INFO, "Output Dir: " + outputDir.getAbsolutePath() );
         Assert.assertTrue( outputDir.exists() );
 
-        File extDir = getFile( outputDir, "ext" );
+        File extDir = new File( outputDir, "ext" );
         Assert.assertTrue( extDir.exists() );
 
-        File invokeDir = getFile( extDir, "blackberry_invoke_Invoke" );
+        File invokeDir = new File( extDir, "blackberry_invoke_Invoke" );
         Assert.assertTrue( invokeDir.exists() );
 
-        File clientFile = getFile( invokeDir, "client.js" );
+        File clientFile = new File( invokeDir, "client.js" );
         Assert.assertTrue( clientFile.exists() );
 
-        File serverFile = getFile( invokeDir, "server.js" );
+        File serverFile = new File( invokeDir, "server.js" );
         Assert.assertTrue( serverFile.exists() );
     }
 

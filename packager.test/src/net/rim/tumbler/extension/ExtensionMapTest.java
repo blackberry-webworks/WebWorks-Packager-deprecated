@@ -2,22 +2,37 @@ package net.rim.tumbler.extension;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
 
 import junit.framework.Assert;
 
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
+import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import net.rim.tumbler.exception.PackageException;
+import net.rim.tumbler.session.SessionManager;
 
 public class ExtensionMapTest {
+    private static Mockery _context = new JUnit4Mockery() {
+        {
+            setImposteriser( ClassImposteriser.INSTANCE );
+        }
+    };
+
+    private static SessionManager _session = _context.mock( SessionManager.class );    
+    
     private static final String PLATFORM = "BBX";
     private static final String TARGET = "default";
-    private static final String EXT_REPO = "bin/bbxwebworks/ext";
-    private static final String OUTPUT_DIR = "out";
+    private static final String EXT_REPO = "../packager.test/src/bbxwebworks/ext";
+    private static final String SOURCE_DIR = "source";
 
     private static boolean deleteDir( File dir ) {
         if( dir.isDirectory() ) {
@@ -45,17 +60,32 @@ public class ExtensionMapTest {
         return null;
     }
 
+    @BeforeClass    
+    public static void mockSession() throws Exception {
+        // mock SessionManager which is used by FileManager
+        _context.checking( new Expectations() {
+            {
+                allowing( _session ).getSourceFolder(); will( returnValue( SOURCE_DIR ) );
+            }
+        } );
+
+        Class< ? > c = SessionManager.class;
+        Field singleton = c.getDeclaredField( "_instance" );
+        singleton.setAccessible( true );
+        singleton.set( null, _session );
+    }    
+
     @Before
     public void cleanOutputDir() {
-        deleteDir( new File( OUTPUT_DIR ) );
+        deleteDir( new File( SessionManager.getInstance().getSourceFolder() ) );
     }
 
-    //@Test
+    @Test
     public void testCopyRequiredFiles() throws IOException, PackageException {
         ExtensionMap map = new ExtensionMap( PLATFORM, TARGET, EXT_REPO );
-        map.copyRequiredFiles( OUTPUT_DIR, "blackberry.invoke" );
+        map.copyRequiredFiles( SessionManager.getInstance().getSourceFolder(), "blackberry.invoke" );
 
-        File outputDir = new File( OUTPUT_DIR );
+        File outputDir = new File( SessionManager.getInstance().getSourceFolder() );
         Assert.assertTrue( outputDir.exists() );
 
         File extDir = getFile( outputDir, "ext" );
@@ -71,11 +101,11 @@ public class ExtensionMapTest {
         Assert.assertTrue( serverFile.exists() );
     }
 
-    //@Test
+    @Test
     public void testGetCopiedFiles() throws IOException, PackageException {
         Map< String, Vector< String >> result = new LinkedHashMap< String, Vector< String >>();
         ExtensionMap map = new ExtensionMap( PLATFORM, TARGET, EXT_REPO );
-        map.copyRequiredFiles( OUTPUT_DIR, "blackberry.system" );
+        map.copyRequiredFiles( SessionManager.getInstance().getSourceFolder(), "blackberry.system" );
 
         map.getCopiedFiles( ".js", result, "" );
 

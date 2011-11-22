@@ -23,8 +23,6 @@ import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -216,8 +214,6 @@ public class ExtensionMap {
     }
 
     public void copyRequiredFiles( String outputFolder, String featureID ) throws IOException, PackageException {
-        Logger.getLogger( "com.rtse" ).log( Level.INFO, "Source dir exists? " + new File("/Users/build/.hudson/jobs/BBX-Packager-next-packageExt/workspace/packager/source").exists() );
-        
         if( _featureIdToDescriptors.containsKey( featureID ) ) {
             for( ExtensionDescriptor descriptor : _featureIdToDescriptors.get( featureID ) ) {
                 HashSet< String > resolvedDependencies = _dependencyManager.resolveExtension( descriptor.getId() );
@@ -251,7 +247,6 @@ public class ExtensionMap {
                                 //
                                 FileManager.copyFile( new File( depDescriptor.getRootFolder(), pathname.getPathname() ),
                                         new File( javascriptPrefix + pathname.getPathname() ) );
-                                Logger.getLogger( "com.rtse" ).log( Level.INFO, "Copied: " + new File( javascriptPrefix + pathname.getPathname() ).getAbsolutePath() );
                             } else if( pathname.getRelativeToPackage() != null ) {
                                 //
                                 // This is something other than javascript and

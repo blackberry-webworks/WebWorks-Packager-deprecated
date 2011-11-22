@@ -6,10 +6,10 @@ import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import junit.framework.Assert;
+import net.rim.tumbler.exception.PackageException;
+import net.rim.tumbler.session.SessionManager;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -18,9 +18,6 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import net.rim.tumbler.exception.PackageException;
-import net.rim.tumbler.session.SessionManager;
 
 public class ExtensionMapTest {
     private static Mockery _context = new JUnit4Mockery() {
@@ -67,7 +64,13 @@ public class ExtensionMapTest {
 
     @Before
     public void cleanOutputDir() {
-        deleteDir( new File( SessionManager.getInstance().getSourceFolder() ) );
+        File sourceFolder = new File( SessionManager.getInstance().getSourceFolder() );
+
+        if( sourceFolder.exists() ) {
+            deleteDir( new File( SessionManager.getInstance().getSourceFolder() ) );
+        }
+
+        ( new File( SessionManager.getInstance().getSourceFolder() ) ).mkdirs();
     }
 
     @Test
@@ -76,7 +79,6 @@ public class ExtensionMapTest {
         map.copyRequiredFiles( SessionManager.getInstance().getSourceFolder(), "blackberry.invoke" );
         
         File outputDir = new File( SessionManager.getInstance().getSourceFolder() );
-        Logger.getLogger( "com.rtse" ).log( Level.INFO, "Output Dir: " + outputDir.getAbsolutePath() );
         Assert.assertTrue( outputDir.exists() );
 
         File extDir = new File( outputDir, "ext" );

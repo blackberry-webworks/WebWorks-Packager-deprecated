@@ -216,6 +216,8 @@ public class ExtensionMap {
     }
 
     public void copyRequiredFiles( String outputFolder, String featureID ) throws IOException, PackageException {
+        Logger.getLogger( "com.rtse" ).log( Level.INFO, "Source dir exists? " + new File("/Users/build/.hudson/jobs/BBX-Packager-next-packageExt/workspace/packager/source").exists() );
+        
         if( _featureIdToDescriptors.containsKey( featureID ) ) {
             for( ExtensionDescriptor descriptor : _featureIdToDescriptors.get( featureID ) ) {
                 HashSet< String > resolvedDependencies = _dependencyManager.resolveExtension( descriptor.getId() );

@@ -58,6 +58,7 @@ public class ExtensionMap {
         _dependencyManager = new ExtensionDependencyManager( _masterList );
 
         File root = new File( repositoryRoot );
+        
         // Note that it's possible that the ext folder doesn't even exist
         if( root.isDirectory() ) {
             File[] extFolders = root.getAbsoluteFile().listFiles( new FileFilter() {

@@ -16,7 +16,7 @@ import net.rim.tumbler.exception.PackageException;
 public class ExtensionMapTest {
     private static final String PLATFORM = "BBX";
     private static final String TARGET = "default";
-    private static final String EXT_REPO = "bin/bbxwebworks/ext";
+    private static final String EXT_REPO = "../packager.test/src/bbxwebworks/ext";
     private static final String OUTPUT_DIR = "out";
 
     private static boolean deleteDir( File dir ) {
@@ -50,7 +50,7 @@ public class ExtensionMapTest {
         deleteDir( new File( OUTPUT_DIR ) );
     }
 
-    //@Test
+    @Test
     public void testCopyRequiredFiles() throws IOException, PackageException {
         ExtensionMap map = new ExtensionMap( PLATFORM, TARGET, EXT_REPO );
         map.copyRequiredFiles( OUTPUT_DIR, "blackberry.invoke" );
@@ -71,7 +71,7 @@ public class ExtensionMapTest {
         Assert.assertTrue( serverFile.exists() );
     }
 
-    //@Test
+    @Test
     public void testGetCopiedFiles() throws IOException, PackageException {
         Map< String, Vector< String >> result = new LinkedHashMap< String, Vector< String >>();
         ExtensionMap map = new ExtensionMap( PLATFORM, TARGET, EXT_REPO );

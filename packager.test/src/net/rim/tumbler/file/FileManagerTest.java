@@ -4,7 +4,6 @@ import java.io.File;
 import java.lang.reflect.Field;
 
 import junit.framework.Assert;
-
 import net.rim.tumbler.session.BBWPProperties;
 import net.rim.tumbler.session.SessionManager;
 
@@ -25,8 +24,8 @@ public class FileManagerTest {
     private static SessionManager _session = _context.mock( SessionManager.class );
     private static BBWPProperties _bbwpProperties;
     
-    private static String OUTPUT_DIR = "bin/out";
-    private static String SOURCE_DIR = "bin/src";
+    private static String OUTPUT_DIR = "out";
+    private static String SOURCE_DIR = "source";
 
     private static void mockSession() throws Exception {
         // mock SessionManager which is used by FileManager
@@ -34,8 +33,8 @@ public class FileManagerTest {
             {
                 allowing( _session ).getOutputFolder(); will( returnValue( OUTPUT_DIR ) );
                 allowing( _session ).getSourceFolder(); will( returnValue( SOURCE_DIR ) );
-                allowing( _session ).getBBWPJarFolder(); will( returnValue( "bin/bbxwebworks/bin" ) );
-                allowing( _session ).getWidgetArchive(); will( returnValue( "bin/bbxwebworks/apps/bbm.zip" ) );
+                allowing( _session ).getBBWPJarFolder(); will( returnValue( "../packager.test/src/bbxwebworks/bin" ) );
+                allowing( _session ).getWidgetArchive(); will( returnValue( "../packager.test/src/bbxwebworks/apps/bbm.zip" ) );
             }
         } );
 
@@ -51,11 +50,11 @@ public class FileManagerTest {
 
         String sessionHome = new File( FileManagerTest.class.getProtectionDomain().getCodeSource().getLocation().toURI() )
                 .getCanonicalPath();
-        sessionHome = sessionHome.indexOf( "bin" ) > -1 ? sessionHome.substring( 0, sessionHome.lastIndexOf( File.separator + "bin" ) ) : sessionHome;
-        _bbwpProperties = new BBWPProperties( "bin/bbxwebworks/bin/bbwp.properties", sessionHome );
+        
+        _bbwpProperties = new BBWPProperties( "../packager.test/src/bbxwebworks/bin/bbwp.properties", sessionHome );
     }
 
-    //@Test
+    @Test
     public void testPrepare() throws Exception {
         FileManager fileMgr = new FileManager( _bbwpProperties );
         fileMgr.prepare();

@@ -6,6 +6,8 @@ import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import junit.framework.Assert;
 import net.rim.tumbler.exception.PackageException;
@@ -70,12 +72,15 @@ public class ExtensionMapTest {
             deleteDir( new File( SessionManager.getInstance().getSourceFolder() ) );
         }
 
-        ( new File( SessionManager.getInstance().getSourceFolder() ) ).mkdirs();
+        sourceFolder.mkdirs();        
     }
 
     @Test
     public void testCopyRequiredFiles() throws IOException, PackageException {
         ExtensionMap map = new ExtensionMap( PLATFORM, TARGET, EXT_REPO );
+        Logger.getLogger( "com.rtse" ).log( Level.INFO,
+                "Source dir exists? " + new File( SessionManager.getInstance().getSourceFolder() ).exists() );        
+        
         map.copyRequiredFiles( SessionManager.getInstance().getSourceFolder(), "blackberry.invoke" );
         
         File outputDir = new File( SessionManager.getInstance().getSourceFolder() );

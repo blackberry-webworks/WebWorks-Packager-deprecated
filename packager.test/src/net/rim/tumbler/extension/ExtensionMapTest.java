@@ -77,12 +77,9 @@ public class ExtensionMapTest {
 
     @Test
     public void testCopyRequiredFiles() throws IOException, PackageException {
-        ExtensionMap map = new ExtensionMap( PLATFORM, TARGET, EXT_REPO );
-        Logger.getLogger( "com.rtse" ).log( Level.INFO,
-                "Source dir exists? " + new File( SessionManager.getInstance().getSourceFolder() ).exists() );        
-        
+        ExtensionMap map = new ExtensionMap( PLATFORM, TARGET, EXT_REPO );        
         map.copyRequiredFiles( SessionManager.getInstance().getSourceFolder(), "blackberry.invoke" );
-        
+
         File outputDir = new File( SessionManager.getInstance().getSourceFolder() );
         Assert.assertTrue( outputDir.exists() );
 

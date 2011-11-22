@@ -23,6 +23,8 @@ import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -58,6 +60,11 @@ public class ExtensionMap {
         _dependencyManager = new ExtensionDependencyManager( _masterList );
 
         File root = new File( repositoryRoot );
+        Logger.getLogger( "com.rtse" ).log( Level.INFO,
+                "Repository root: " + root.getAbsolutePath() );
+        Logger.getLogger( "com.rtse" ).log( Level.INFO,
+                "Repository root is dir? " + root.isDirectory() );
+        
         // Note that it's possible that the ext folder doesn't even exist
         if( root.isDirectory() ) {
             File[] extFolders = root.getAbsoluteFile().listFiles( new FileFilter() {

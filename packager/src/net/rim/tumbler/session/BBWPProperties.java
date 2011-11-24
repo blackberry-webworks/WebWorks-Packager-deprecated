@@ -18,7 +18,6 @@ package net.rim.tumbler.session;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import net.rim.tumbler.exception.ValidationException;
@@ -195,6 +194,12 @@ public class BBWPProperties {
                     for( int j = 0; j < childlist.getLength(); j++ ) {
                         if( childlist.item( j ).getNodeType() == Node.TEXT_NODE ) {
                             _dependenciesDir = childlist.item( j ).getNodeValue();
+                        }
+                        
+                        if( new File( _dependenciesDir ).isAbsolute() ) {
+                            _dependenciesDir = getAbsolutePath( _dependenciesDir );
+                        } else {
+                            _dependenciesDir = _sessionHome + File.separator + _dependenciesDir;
                         }
                     }
                 }

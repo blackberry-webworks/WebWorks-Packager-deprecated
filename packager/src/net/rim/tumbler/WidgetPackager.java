@@ -205,7 +205,7 @@ public class WidgetPackager {
             // library.xml files to parse. This is independent of config.xml, so far.
             //
 
-            ExtensionMap extensionMap = new ExtensionMap( "AIR", "default", bbwpProperties.getExtensionRepo( SessionManager
+            ExtensionMap extensionMap = new ExtensionMap( "BBX", "default", bbwpProperties.getExtensionRepo( SessionManager
                     .getInstance().getSessionHome() ) ); // location of the extension repository
 
             //
@@ -245,7 +245,7 @@ public class WidgetPackager {
             //
             // Fill-in the javascript entry-class table. This is used elsewhere.
             //
-            extensionMap.getCopiedFiles( ".js", result, "WebWorksApplicationSharedJsRepository0" + File.separator );
+            extensionMap.getCopiedFiles( ".js", result, "ext" + File.separator );
         }
         return result;
     }

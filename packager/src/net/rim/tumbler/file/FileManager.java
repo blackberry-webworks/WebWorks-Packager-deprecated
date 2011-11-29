@@ -51,7 +51,10 @@ public class FileManager {
     }
 
     public void cleanSource() {
-        deleteDirectory( new File( SessionManager.getInstance().getSourceFolder() ) );
+        File sourceDir = new File( SessionManager.getInstance().getSourceFolder() );
+        
+        deleteDirectory( sourceDir );
+        sourceDir.mkdirs();
     }
 
     private void copyBootstrapScript() throws IOException {
@@ -145,10 +148,8 @@ public class FileManager {
 
     public void prepare() throws Exception {
         deleteDirectory( new File( SessionManager.getInstance().getOutputFolder() ) );
-        
-        cleanSource();
 
-        ( new File( SessionManager.getInstance().getSourceFolder() ) ).mkdirs();
+        cleanSource();
 
         copyBootstrapScript();
 

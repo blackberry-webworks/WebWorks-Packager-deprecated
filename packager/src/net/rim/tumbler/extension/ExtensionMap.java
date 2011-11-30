@@ -26,7 +26,7 @@ import net.rim.tumbler.file.FileManager;
 public class ExtensionMap {
 
     // need to check in this collection first before creating a new ExtensionDescriptor
-    private Map< String, ExtensionDescriptor > _masterList; // map from an entryClass key to the corresponding extension
+    private Map< String, ExtensionDescriptor > _masterList; // map from an featureID key to the corresponding extension
                                                             // descriptor (of that same entryClass)
 
     public ExtensionMap( String platform, String version, String repositoryRoot ) {
@@ -44,7 +44,7 @@ public class ExtensionMap {
                 _masterList.put( id, descriptor );
                 
                 for( File f : extFolder.listFiles() ) {
-                    if (f.isDirectory()) {
+                    if( f.isDirectory() ) {
                         addFilesRecursively( descriptor, f, "", "" );
                     } else {
                         descriptor.addConfiguredPathname( f.getName() );
@@ -81,44 +81,14 @@ public class ExtensionMap {
         ExtensionDescriptor depDescriptor = _masterList.get( featureID );
 
         if( depDescriptor != null && !depDescriptor.isCopied() ) {
-            //
-            // The prefix for javascript files. This can be
-            // prepended
-            // as-is to the configured pathname.
-            //
             String javascriptPrefix = outputFolder + File.separator + "ext" + File.separator + featureID + File.separator;
-
-            //
-            // The partial prefix for actionscript files. This needs
-            // the folder structure such that it matches
-            // the package name.
-            //
-            String actionscriptPrefix = outputFolder + File.separator;
 
             for( ConfiguredPathname pathname : depDescriptor.getConfiguredPathnames() ) {
                 if( pathname.getPathname().endsWith( ".js" ) ) {
-                    //
-                    // This is javascript and therefore has no
-                    // package.
-                    // Copy to javascriptPrefix +
-                    // pathname.getPathname().
-                    //
                     FileManager.copyFile( new File( depDescriptor.getRootFolder(), pathname.getPathname() ),
                             new File( javascriptPrefix + pathname.getPathname() ) );
-                } else if( pathname.getRelativeToPackage() != null ) {
-                    //
-                    // This is something other than javascript and
-                    // presumably has
-                    // the notion of a package (e.g., ActionScript
-                    // or Java).
-                    // Copy to actionscriptPrefix +
-                    // pathname.getRelativeToPackage().
-                    //
-                    FileManager.copyFile( new File( depDescriptor.getRootFolder(), pathname.getPathname() ),
-                            new File( actionscriptPrefix + pathname.getRelativeToPackage() ) );
                 } else {
-                    // unexpected file type
-                    // TODO: log it
+                    throw new PackageException( "EXCEPTION_INVALID_FILE_TYPE", featureID );
                 }
             }
 

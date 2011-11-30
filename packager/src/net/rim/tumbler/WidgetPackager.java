@@ -15,12 +15,9 @@
  */
 package net.rim.tumbler;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -102,13 +99,12 @@ public class WidgetPackager {
             //
             // Copy the JS extensions.
             //
-            Map< String, Vector< String >> entryClassTable = null;
             if( SessionManager.getInstance().isPlayBook() ) {
-                entryClassTable = copyExtensions( bbwpProperties, config );
+                copyExtensions( bbwpProperties, config );
             }
 
             // create autogen file
-            WidgetConfigSerializer wcs = new WidgetConfig_v1Serializer( config, entryClassTable );
+            WidgetConfigSerializer wcs = new WidgetConfig_v1Serializer( config );
             byte[] autogenFile = wcs.serialize();
             fileManager.writeToSource( autogenFile, AUTOGEN_FILE );
 
@@ -182,13 +178,9 @@ public class WidgetPackager {
      *            the current widget properties.
      * @param config
      *            the current widget configuration.
-     * 
-     * @return a newly-created, populated hashtable as described above.
      */
-    private static Map< String, Vector< String >> copyExtensions( BBWPProperties bbwpProperties, WidgetConfig config )
+    private static void copyExtensions( BBWPProperties bbwpProperties, WidgetConfig config )
             throws IOException, PackageException {
-        Map< String, Vector< String >> result = new LinkedHashMap< String, Vector< String >>();
-
         //
         // We need to copy the correct set of extension source files from the
         // extension repository into the project area so that they can be
@@ -241,12 +233,6 @@ public class WidgetPackager {
                 extensionMap.copyRequiredFiles( SessionManager.getInstance().getSourceFolder(), // destination for extensions
                         featureID );
             }
-
-            //
-            // Fill-in the javascript entry-class table. This is used elsewhere.
-            //
-            extensionMap.getCopiedFiles( ".js", result, "ext" + File.separator );
         }
-        return result;
     }
 }

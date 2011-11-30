@@ -1,0 +1,1 @@
+blackberry.app client.js

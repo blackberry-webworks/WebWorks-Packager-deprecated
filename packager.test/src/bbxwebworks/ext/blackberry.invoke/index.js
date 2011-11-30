@@ -1,0 +1,1 @@
+blackberry.invoke index.js

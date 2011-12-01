@@ -15,7 +15,6 @@
  */
 package net.rim.tumbler.serialize;
 
-import java.util.Map;
 import java.util.Vector;
 
 import net.rim.tumbler.config.WidgetAccess;
@@ -34,7 +33,6 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
     private StringBuffer _buffer;
     private JSONObject _configValues;
     private WidgetConfig _widgetConfig;
-    private Map<String, Vector<String>> _entryClassTable;
     private static final String[] KEYS_PROP_STRING = { 
         "version",
         "id",
@@ -67,11 +65,10 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
         "debugEnabled"        
     };
 
-    public WidgetConfig_v1Serializer( WidgetConfig widgetConfig, Map< String, Vector< String >> entryClassTable ) {
+    public WidgetConfig_v1Serializer( WidgetConfig widgetConfig ) {
         _buffer = new StringBuffer( "module.exports = " );
         _configValues = new JSONObject();
         _widgetConfig = widgetConfig;
-        _entryClassTable = entryClassTable;
     }
     
     private void serializeStringProperties() throws JSONException {
@@ -190,26 +187,6 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
             if( _widgetConfig.getNavigationMode() ) {
                 _configValues.put( "navigationMode", "focus" );
             }
-            
-            //add widget extensions
-            if (_entryClassTable != null){
-                JSONArray widgetExtensions = new JSONArray();
-                for (String entryClass : _entryClassTable.keySet()) {
-                    JSONObject extension = new JSONObject();
-                    JSONArray requiredJSFiles = new JSONArray();
-                    
-                    extension.put("class", entryClass);
-                    extension.put("requiredJSFiles", requiredJSFiles);
-    
-                    for (String jsPathname : _entryClassTable.get(entryClass)) {
-                        requiredJSFiles.put(jsPathname.replace('\\', '/'));
-                    }
-    
-                    widgetExtensions.put(extension);
-                }
-                
-                _configValues.put("widgetExtensions", widgetExtensions);
-            }
 
             //Print out JSON data in a nice formatted way
             _buffer.append( _configValues.toString(4) );
@@ -228,7 +205,7 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
 
         return null;
     }
-    
+
     public static String[] getStringPropKeys() {
         return KEYS_PROP_STRING;
     }

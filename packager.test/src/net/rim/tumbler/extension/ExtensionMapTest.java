@@ -3,9 +3,6 @@ package net.rim.tumbler.extension;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Vector;
 
 import junit.framework.Assert;
 import net.rim.tumbler.exception.PackageException;
@@ -84,31 +81,25 @@ public class ExtensionMapTest {
         File extDir = new File( outputDir, "ext" );
         Assert.assertTrue( extDir.exists() );
 
-        File invokeDir = new File( extDir, "blackberry_invoke_Invoke" );
+        File invokeDir = new File( extDir, "blackberry.invoke" );
         Assert.assertTrue( invokeDir.exists() );
 
         File clientFile = new File( invokeDir, "client.js" );
         Assert.assertTrue( clientFile.exists() );
 
-        File serverFile = new File( invokeDir, "server.js" );
-        Assert.assertTrue( serverFile.exists() );
+        File indexFile = new File( invokeDir, "index.js" );
+        Assert.assertTrue( indexFile.exists() );
     }
-
+    
     @Test
-    public void testGetCopiedFiles() throws IOException, PackageException {
-        Map< String, Vector< String >> result = new LinkedHashMap< String, Vector< String >>();
-        ExtensionMap map = new ExtensionMap( PLATFORM, TARGET, EXT_REPO );
-        map.copyRequiredFiles( SessionManager.getInstance().getSourceFolder(), "blackberry.system" );
+    public void testCopyRequiredFilesNonExistentExtension() throws IOException, PackageException {
+        ExtensionMap map = new ExtensionMap( PLATFORM, TARGET, EXT_REPO );        
+        map.copyRequiredFiles( SessionManager.getInstance().getSourceFolder(), "not.exists" );
 
-        map.getCopiedFiles( ".js", result, "" );
+        File outputDir = new File( SessionManager.getInstance().getSourceFolder() );
+        Assert.assertTrue( outputDir.exists() );
 
-        String key = "blackberry.system.System";
-        Assert.assertTrue( result.containsKey( key ) );
-
-        Vector<String> value = result.get( key );
-        Assert.assertFalse( value.isEmpty() );
-
-        Assert.assertTrue( value.contains( "blackberry_system_System" + File.separator + "client.js" ) );
-        Assert.assertTrue( value.contains( "blackberry_system_System" + File.separator + "server.js" ) );
+        File extDir = new File( outputDir, "ext" );
+        Assert.assertFalse( extDir.exists() );
     }
 }

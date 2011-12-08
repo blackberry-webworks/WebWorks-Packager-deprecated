@@ -63,6 +63,6 @@ public class FileManagerTest {
         Assert.assertTrue( new File( SOURCE_DIR + "/bin/bbx-framework" ).exists() );
         Assert.assertTrue( new File( SOURCE_DIR + "/dependencies" ).exists() );
         Assert.assertTrue( new File( SOURCE_DIR + "/lib" ).exists() );
-        Assert.assertTrue( new File( SOURCE_DIR + "/lib/public/icon.png" ).exists() );
+        Assert.assertTrue( new File( SOURCE_DIR + "/icon.png" ).exists() );
     }
 }

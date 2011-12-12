@@ -84,7 +84,7 @@ public class FileManager {
                 continue;
 
             File zipEntryFile = new File( ze.getName() );
-            String fname = sourceFolder + "/lib/public/" + zipEntryFile.getPath();
+            String fname = sourceFolder + File.separator + zipEntryFile.getPath();
 
             // extract file
             InputStream is = new BufferedInputStream( zip.getInputStream( ze ) );

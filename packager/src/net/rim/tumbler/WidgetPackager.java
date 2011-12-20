@@ -136,10 +136,7 @@ public class WidgetPackager {
 //                    signCod( sessionManager );
 //                }
 //                Logger.logMessage( LogType.INFO, "PROGRESS_SIGNING_COMPLETE" );
-//            }
-
-            // clean/prep output folders
-            fileManager.cleanOutput();            
+//            }          
 
             Logger.logMessage( LogType.INFO, "PROGRESS_GEN_OUTPUT" );
 

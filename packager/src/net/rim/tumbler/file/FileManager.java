@@ -46,14 +46,6 @@ public class FileManager {
         _inputFiles = new Vector< String >();
     }
 
-    public void cleanOutput() {
-        File zipFile = getOutputFolderZipFile();
-
-        if( zipFile.exists() ) {
-            zipFile.delete();
-        }
-    }
-
     public void cleanSource() {
         File sourceDir = new File( SessionManager.getInstance().getSourceFolder() );        
         deleteDirectory( sourceDir );
@@ -112,14 +104,7 @@ public class FileManager {
         }
     }
 
-    private static File getOutputFolderZipFile() {
-        String zipFileName = new File( SessionManager.getInstance().getWidgetArchive() ).getName();
-        return new File( SessionManager.getInstance().getOutputFolder() + FILE_SEP + zipFileName );
-    }
-
     public void prepare() throws Exception {
-        deleteDirectory( new File( SessionManager.getInstance().getOutputFolder() ) );
-
         cleanSource();
 
         copyBootstrapScript();

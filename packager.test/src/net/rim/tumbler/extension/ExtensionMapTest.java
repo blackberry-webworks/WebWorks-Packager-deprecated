@@ -3,6 +3,7 @@ package net.rim.tumbler.extension;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.List;
 
 import junit.framework.Assert;
 import net.rim.tumbler.exception.PackageException;
@@ -74,6 +75,7 @@ public class ExtensionMapTest {
     public void testCopyRequiredFiles() throws IOException, PackageException {
         ExtensionMap map = new ExtensionMap( PLATFORM, TARGET, EXT_REPO );        
         map.copyRequiredFiles( SessionManager.getInstance().getSourceFolder(), "blackberry.invoke" );
+        List< String > copiedFiles = map.getCopiedFiles();
 
         File outputDir = new File( SessionManager.getInstance().getSourceFolder() );
         Assert.assertTrue( outputDir.exists() );
@@ -86,9 +88,11 @@ public class ExtensionMapTest {
 
         File clientFile = new File( invokeDir, "client.js" );
         Assert.assertTrue( clientFile.exists() );
+        Assert.assertTrue( copiedFiles.contains( clientFile.getAbsolutePath() ) );
 
         File indexFile = new File( invokeDir, "index.js" );
         Assert.assertTrue( indexFile.exists() );
+        Assert.assertTrue( copiedFiles.contains( indexFile.getAbsolutePath() ) );
     }
     
     @Test

@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 import net.rim.tumbler.WidgetPackager;
 import net.rim.tumbler.exception.PackageException;
@@ -109,55 +108,13 @@ public class FileManager {
                 fos.write( bytesRead );
             fos.close();
             
-            _inputFiles.add( fname );
+            _inputFiles.add( fi.getAbsolutePath() );
         }
-    }
-
-    public void createOutputZip() throws IOException {
-        File outputDir = new File( SessionManager.getInstance().getOutputFolder() );
-        File sourceDir = new File( SessionManager.getInstance().getSourceFolder() );
-        File zip = getOutputFolderZipFile();
-        
-        if( !outputDir.exists() ) {
-            outputDir.mkdirs();
-        }
-        
-        ZipOutputStream out = new ZipOutputStream( new FileOutputStream( zip ) );
-
-        createZipEntry( zip, sourceDir, "", sourceDir, out );
-        
-        out.close();
     }
 
     private static File getOutputFolderZipFile() {
         String zipFileName = new File( SessionManager.getInstance().getWidgetArchive() ).getName();
         return new File( SessionManager.getInstance().getOutputFolder() + FILE_SEP + zipFileName );
-    }
-
-    private static void createZipEntry( File zip, File sourceDir, String parentDir, File toZip, ZipOutputStream out )
-            throws IOException {
-        if( toZip.isDirectory() ) {
-            File[] files = toZip.listFiles();
-
-            for( File f : files ) {
-                createZipEntry( zip, sourceDir, sourceDir.equals( toZip ) ? "" : parentDir + FILE_SEP + toZip.getName(), f, out );
-            }
-        } else {
-            if( !zip.equals( toZip ) ) {
-                byte[] buf = new byte[ 1024 ];
-                FileInputStream in = new FileInputStream( toZip );
-                int len;
-
-                out.putNextEntry( new ZipEntry( parentDir + FILE_SEP + toZip.getName() ) );
-
-                while( ( len = in.read( buf ) ) > 0 ) {
-                    out.write( buf, 0, len );
-                }
-
-                out.closeEntry();
-                in.close();
-            }
-        }
     }
 
     public void prepare() throws Exception {

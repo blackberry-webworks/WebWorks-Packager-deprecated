@@ -25,21 +25,26 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import net.rim.tumbler.WidgetPackager;
 import net.rim.tumbler.exception.PackageException;
 import net.rim.tumbler.session.BBWPProperties;
 import net.rim.tumbler.session.SessionManager;
 
 public class FileManager {
     private BBWPProperties _bbwpProperties;
+    private Vector< String > _inputFiles;
 
     private static final String FILE_SEP = System.getProperty( "file.separator" );
 
     public FileManager( BBWPProperties bbwpProperties ) {
         _bbwpProperties = bbwpProperties;
+        _inputFiles = new Vector< String >();
     }
 
     public void cleanOutput() {
@@ -51,25 +56,32 @@ public class FileManager {
     }
 
     public void cleanSource() {
-        File sourceDir = new File( SessionManager.getInstance().getSourceFolder() );
-        
+        File sourceDir = new File( SessionManager.getInstance().getSourceFolder() );        
         deleteDirectory( sourceDir );
         sourceDir.mkdirs();
     }
 
     private void copyBootstrapScript() throws IOException {
-        copyFile( new File( SessionManager.getInstance().getBBWPJarFolder() + "/bbx-framework" ), new File( SessionManager
-                .getInstance().getSourceFolder() + "/bin/bbx-framework" ) );
+        File target = new File( SessionManager.getInstance().getSourceFolder(), "/bin/bbx-framework" );
+        copyFile( new File( SessionManager.getInstance().getBBWPJarFolder() + "/bbx-framework" ), target );
+        _inputFiles.add( target.getAbsolutePath() );
+    }
+
+    private void copyWWExecutable() throws IOException {
+        File target = new File( SessionManager.getInstance().getSourceFolder(), WidgetPackager.WW_EXECUTABLE_FILE );
+        copyFile( new File( SessionManager.getInstance().getBBWPJarFolder() + FILE_SEP + WidgetPackager.WW_EXECUTABLE_FILE ),
+                target );
+        _inputFiles.add( target.getAbsolutePath() );
     }
 
     private void copyLib() throws IOException {
         TemplateWrapper templateWrapper = new TemplateWrapper( _bbwpProperties.getTemplateDir() );
-        templateWrapper.writeAllTemplates( SessionManager.getInstance().getSourceFolder() + "/lib" );
+        _inputFiles.addAll( templateWrapper.writeAllTemplates( SessionManager.getInstance().getSourceFolder() + "/lib" ) );
     }
 
     private void copyDependencies() throws IOException {
         TemplateWrapper wrapper = new TemplateWrapper( _bbwpProperties.getDependenciesDir() );
-        wrapper.writeAllTemplates( SessionManager.getInstance().getSourceFolder() + "/dependencies" );
+        _inputFiles.addAll( wrapper.writeAllTemplates( SessionManager.getInstance().getSourceFolder() + "/dependencies" ) );
     }
 
     private void extractArchive() throws IOException {
@@ -96,6 +108,8 @@ public class FileManager {
             while( ( bytesRead = is.read() ) != -1 )
                 fos.write( bytesRead );
             fos.close();
+            
+            _inputFiles.add( fname );
         }
     }
 
@@ -152,6 +166,8 @@ public class FileManager {
         cleanSource();
 
         copyBootstrapScript();
+
+        copyWWExecutable();
 
         copyLib();
 
@@ -213,6 +229,10 @@ public class FileManager {
             return dir.delete();
         }
         return false;
+    }
+    
+    public List< String > getFiles() {
+        return _inputFiles;
     }
 
     /**

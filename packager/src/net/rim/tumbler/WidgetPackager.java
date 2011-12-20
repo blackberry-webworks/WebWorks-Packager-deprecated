@@ -18,9 +18,11 @@ package net.rim.tumbler;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import net.rim.tumbler.bar.NativePackager;
 import net.rim.tumbler.config.WidgetAccess;
 import net.rim.tumbler.config.WidgetConfig;
 import net.rim.tumbler.config.WidgetFeature;
@@ -42,6 +44,7 @@ public class WidgetPackager {
 
     public static final String PROPERTIES_FILE = "bbwp.properties";
     public static final String SIGNATURE_KEY_FILE = "sigtool.csk";
+    public static final String WW_EXECUTABLE_FILE = "wwe";
 
     private static final String AUTOGEN_FILE = "lib/config/user.js";
 
@@ -95,12 +98,18 @@ public class WidgetPackager {
             FileManager fileManager = new FileManager( bbwpProperties );
             Logger.logMessage( LogType.INFO, "PROGRESS_FILE_POPULATING_SOURCE" );
             fileManager.prepare();
+            
+            List< String > inputFiles = fileManager.getFiles();
 
             //
             // Copy the JS extensions.
             //
             if( SessionManager.getInstance().isPlayBook() ) {
-                copyExtensions( bbwpProperties, config );
+                List< String > copiedFiles = copyExtensions( bbwpProperties, config );
+
+                if( copiedFiles != null ) {
+                    inputFiles.addAll( copiedFiles );
+                }
             }
 
             // create autogen file
@@ -133,9 +142,11 @@ public class WidgetPackager {
             fileManager.cleanOutput();            
 
             Logger.logMessage( LogType.INFO, "PROGRESS_GEN_OUTPUT" );
-            
-            // create output zip file
-            fileManager.createOutputZip();
+
+            // create output bar file
+            Logger.logMessage( LogType.INFO, "PROGRESS_PACKAGING" );
+            new NativePackager( config, inputFiles ).run();
+            Logger.logMessage( LogType.INFO, "PACKAGING_COMPLETE" );
 
             // clean source (if necessary)
             if( !sessionManager.requireSource() ) {
@@ -178,8 +189,9 @@ public class WidgetPackager {
      *            the current widget properties.
      * @param config
      *            the current widget configuration.
+     * @return list of copied files path
      */
-    private static void copyExtensions( BBWPProperties bbwpProperties, WidgetConfig config )
+    private static List< String > copyExtensions( BBWPProperties bbwpProperties, WidgetConfig config )
             throws IOException, PackageException {
         //
         // We need to copy the correct set of extension source files from the
@@ -233,6 +245,10 @@ public class WidgetPackager {
                 extensionMap.copyRequiredFiles( SessionManager.getInstance().getSourceFolder(), // destination for extensions
                         featureID );
             }
+            
+            return extensionMap.getCopiedFiles();
         }
+        
+        return null;
     }
 }

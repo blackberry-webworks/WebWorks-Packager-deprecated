@@ -31,6 +31,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import net.rim.tumbler.OSUtils;
 import net.rim.tumbler.WidgetPackager;
 import net.rim.tumbler.config.WidgetConfig;
 import net.rim.tumbler.exception.PackageException;
@@ -155,15 +156,19 @@ public class NativePackager {
     private void execNativePackager() throws IOException, InterruptedException, PackageException {
         SessionManager session = SessionManager.getInstance();
         File cwd = new File( session.getSourceFolder() );
+        String script = "blackberry-nativepackager";
+
+        if( OSUtils.isWindows() ) {
+            script += ".bat";
+        }
 
         if( !cwd.exists() ) {
             cwd.mkdirs();
         }
 
-        // TODO mac support
         Process p = Runtime.getRuntime().exec(
-                new String[] { new File( session.getBBWPJarFolder() + "/tools/bin", "blackberry-nativepackager.bat" ).getAbsolutePath(),
-                        "@options" }, null, cwd );
+                new String[] { new File( session.getBBWPJarFolder() + "/tools/bin", script ).getAbsolutePath(), "@options" },
+                null, cwd );
 
         OutputBuffer stdout = new OutputBuffer( p );
         ErrorBuffer stderr = new ErrorBuffer( p );

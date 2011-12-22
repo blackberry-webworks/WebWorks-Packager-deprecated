@@ -25,52 +25,64 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
+import net.rim.tumbler.WidgetPackager;
+import net.rim.tumbler.config.WidgetAccess;
+import net.rim.tumbler.config.WidgetConfig;
+import net.rim.tumbler.config.WidgetFeature;
 import net.rim.tumbler.exception.PackageException;
+import net.rim.tumbler.extension.ExtensionMap;
 import net.rim.tumbler.session.BBWPProperties;
 import net.rim.tumbler.session.SessionManager;
 
 public class FileManager {
+    private WidgetConfig _config;
     private BBWPProperties _bbwpProperties;
+    private Vector< String > _inputFiles;
 
     private static final String FILE_SEP = System.getProperty( "file.separator" );
 
-    public FileManager( BBWPProperties bbwpProperties ) {
+    public FileManager( WidgetConfig config, BBWPProperties bbwpProperties ) {
+        _config = config;
         _bbwpProperties = bbwpProperties;
-    }
-
-    public void cleanOutput() {
-        File zipFile = getOutputFolderZipFile();
-
-        if( zipFile.exists() ) {
-            zipFile.delete();
-        }
+        _inputFiles = new Vector< String >();
     }
 
     public void cleanSource() {
-        File sourceDir = new File( SessionManager.getInstance().getSourceFolder() );
-        
+        File sourceDir = new File( SessionManager.getInstance().getSourceFolder() );        
         deleteDirectory( sourceDir );
         sourceDir.mkdirs();
     }
 
     private void copyBootstrapScript() throws IOException {
-        copyFile( new File( SessionManager.getInstance().getBBWPJarFolder() + "/bbx-framework" ), new File( SessionManager
-                .getInstance().getSourceFolder() + "/bin/bbx-framework" ) );
+        File target = new File( SessionManager.getInstance().getSourceFolder(), "/bin/bbx-framework" );
+        copyFile( new File( SessionManager.getInstance().getBBWPJarFolder() + "/bbx-framework" ), target );
+        _inputFiles.add( target.getAbsolutePath() );
+    }
+
+    private void copyWWExecutable() throws IOException {
+        File target = new File( SessionManager.getInstance().getSourceFolder(), WidgetPackager.WW_EXECUTABLE_FILE );
+        copyFile( new File( SessionManager.getInstance().getBBWPJarFolder() + FILE_SEP + WidgetPackager.WW_EXECUTABLE_FILE ),
+                target );
+        _inputFiles.add( target.getAbsolutePath() );
     }
 
     private void copyLib() throws IOException {
         TemplateWrapper templateWrapper = new TemplateWrapper( _bbwpProperties.getTemplateDir() );
-        templateWrapper.writeAllTemplates( SessionManager.getInstance().getSourceFolder() + "/lib" );
+        _inputFiles.addAll( templateWrapper.writeAllTemplates( SessionManager.getInstance().getSourceFolder() + "/lib" ) );
     }
 
     private void copyDependencies() throws IOException {
         TemplateWrapper wrapper = new TemplateWrapper( _bbwpProperties.getDependenciesDir() );
-        wrapper.writeAllTemplates( SessionManager.getInstance().getSourceFolder() + "/dependencies" );
-    }
+        _inputFiles.addAll( wrapper.writeAllTemplates( SessionManager.getInstance().getSourceFolder() + "/dependencies" ) );
+    }    
 
     private void extractArchive() throws IOException {
         ZipFile zip = new ZipFile( new File( SessionManager.getInstance().getWidgetArchive() ).getAbsolutePath() );
@@ -96,68 +108,81 @@ public class FileManager {
             while( ( bytesRead = is.read() ) != -1 )
                 fos.write( bytesRead );
             fos.close();
+            
+            _inputFiles.add( fi.getAbsolutePath() );
         }
     }
 
-    public void createOutputZip() throws IOException {
-        File outputDir = new File( SessionManager.getInstance().getOutputFolder() );
-        File sourceDir = new File( SessionManager.getInstance().getSourceFolder() );
-        File zip = getOutputFolderZipFile();
-        
-        if( !outputDir.exists() ) {
-            outputDir.mkdirs();
-        }
-        
-        ZipOutputStream out = new ZipOutputStream( new FileOutputStream( zip ) );
+    /**
+     * Copies the correct set of extension source files from the extension repository into the project area so that they can be
+     * compiled along with the framework, and returns a hashtable populated with javascript file names for use downstream. Each
+     * key in the hashtable is the entry class name, and the value contains the relative pathnames of the corresponding javascript
+     * files.
+     */
+    private void copyExtensions() throws IOException, PackageException {
+        Hashtable< WidgetAccess, Vector< WidgetFeature >> accessTable = _config.getAccessTable();
+        // if the access table is empty, don't even bother since there's no features to search for
+        if( accessTable != null && accessTable.size() > 0 ) {
+            //
+            // Go ahead and traverse the extension repository, looking for
+            // library.xml files to parse. This is independent of config.xml, so far.
+            //
 
-        createZipEntry( zip, sourceDir, "", sourceDir, out );
-        
-        out.close();
-    }
+            ExtensionMap extensionMap = new ExtensionMap( "BBX", "default", _bbwpProperties.getExtensionRepo( SessionManager
+                    .getInstance().getSessionHome() ) ); // location of the extension repository
 
-    private static File getOutputFolderZipFile() {
-        String zipFileName = new File( SessionManager.getInstance().getWidgetArchive() ).getName();
-        return new File( SessionManager.getInstance().getOutputFolder() + FILE_SEP + zipFileName );
-    }
-
-    private static void createZipEntry( File zip, File sourceDir, String parentDir, File toZip, ZipOutputStream out )
-            throws IOException {
-        if( toZip.isDirectory() ) {
-            File[] files = toZip.listFiles();
-
-            for( File f : files ) {
-                createZipEntry( zip, sourceDir, sourceDir.equals( toZip ) ? "" : parentDir + FILE_SEP + toZip.getName(), f, out );
-            }
-        } else {
-            if( !zip.equals( toZip ) ) {
-                byte[] buf = new byte[ 1024 ];
-                FileInputStream in = new FileInputStream( toZip );
-                int len;
-
-                out.putNextEntry( new ZipEntry( parentDir + FILE_SEP + toZip.getName() ) );
-
-                while( ( len = in.read( buf ) ) > 0 ) {
-                    out.write( buf, 0, len );
+            //
+            // Extract the set of feature IDs from the access table.
+            // We flatten the structure since we don't care about the
+            // access node or whether it applies to local access; all
+            // we want are the unique feature IDs.
+            //
+            Set< String > featureIDs = new HashSet< String >();
+            for( Vector< WidgetFeature > accessTableValue : accessTable.values() ) {
+                for( WidgetFeature widgetFeature : accessTableValue ) {
+                    featureIDs.add( widgetFeature.getID() );
                 }
-
-                out.closeEntry();
-                in.close();
             }
+
+            //
+            // For each feature ID in the set, we now perform the copying
+            // based on the extension map that we constructed from the
+            // library.xml files. The extension map will make sure we don't
+            // copy the same set of files twice.
+            //
+
+            for( String featureID : featureIDs ) {
+                //
+                // The ExtensionMap is responsible for avoiding duplication.
+                // In particular, extension sets are marked as such after
+                // they have been copied to avoid duplication.
+                //
+                // This method is also responsible for distinguishing between
+                // ActionScript and JavaScript source files. For this purpose
+                // file name extensions may be used.
+                //
+                extensionMap.copyRequiredFiles( SessionManager.getInstance().getSourceFolder(), // destination for extensions
+                        featureID );
+            }
+            
+            _inputFiles.addAll( extensionMap.getCopiedFiles() );
         }
-    }
-
+    }    
+    
     public void prepare() throws Exception {
-        deleteDirectory( new File( SessionManager.getInstance().getOutputFolder() ) );
-
         cleanSource();
 
         copyBootstrapScript();
+
+        copyWWExecutable();
 
         copyLib();
 
         copyDependencies();
 
         extractArchive();
+        
+        copyExtensions();
     }
 
     public void writeToSource( byte[] fileToWrite, String relativeFile ) throws Exception {
@@ -213,6 +238,10 @@ public class FileManager {
             return dir.delete();
         }
         return false;
+    }
+    
+    public List< String > getFiles() {
+        return _inputFiles;
     }
 
     /**

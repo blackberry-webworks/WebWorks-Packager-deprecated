@@ -18,7 +18,9 @@ package net.rim.tumbler.extension;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import net.rim.tumbler.exception.PackageException;
 import net.rim.tumbler.file.FileManager;
@@ -28,9 +30,11 @@ public class ExtensionMap {
     // need to check in this collection first before creating a new ExtensionDescriptor
     private Map< String, ExtensionDescriptor > _masterList; // map from an featureID key to the corresponding extension
                                                             // descriptor (of that same entryClass)
+    private Vector< String > _copiedFiles;
 
     public ExtensionMap( String platform, String version, String repositoryRoot ) {
         _masterList = new LinkedHashMap< String, ExtensionDescriptor >();
+        _copiedFiles = new Vector< String >();
 
         File root = new File( repositoryRoot );
 
@@ -85,8 +89,9 @@ public class ExtensionMap {
 
             for( ConfiguredPathname pathname : depDescriptor.getConfiguredPathnames() ) {
                 if( pathname.getPathname().endsWith( ".js" ) ) {
-                    FileManager.copyFile( new File( depDescriptor.getRootFolder(), pathname.getPathname() ),
-                            new File( javascriptPrefix + pathname.getPathname() ) );
+                    File target = new File( javascriptPrefix + pathname.getPathname() );
+                    FileManager.copyFile( new File( depDescriptor.getRootFolder(), pathname.getPathname() ), target );
+                    _copiedFiles.add( target.getAbsolutePath() );
                 } else {
                     throw new PackageException( "EXCEPTION_INVALID_FILE_TYPE", featureID );
                 }
@@ -94,5 +99,9 @@ public class ExtensionMap {
 
             depDescriptor.markCopied();
         }
+    }
+    
+    public List< String > getCopiedFiles() {
+        return _copiedFiles;
     }
 }

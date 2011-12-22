@@ -15,21 +15,11 @@
  */
 package net.rim.tumbler;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
-
 import net.rim.tumbler.bar.NativePackager;
-import net.rim.tumbler.config.WidgetAccess;
 import net.rim.tumbler.config.WidgetConfig;
-import net.rim.tumbler.config.WidgetFeature;
 import net.rim.tumbler.exception.CommandLineException;
 import net.rim.tumbler.exception.PackageException;
 import net.rim.tumbler.exception.ValidationException;
-import net.rim.tumbler.extension.ExtensionMap;
 import net.rim.tumbler.file.FileManager;
 import net.rim.tumbler.log.LogType;
 import net.rim.tumbler.log.Logger;
@@ -95,29 +85,16 @@ public class WidgetPackager {
 
             // create/clean outputs/source
             // Logger.printInfoMessage("Widget packaging starts...");
-            FileManager fileManager = new FileManager( bbwpProperties );
+            FileManager fileManager = new FileManager( config, bbwpProperties );
             Logger.logMessage( LogType.INFO, "PROGRESS_FILE_POPULATING_SOURCE" );
             fileManager.prepare();
-            
-            List< String > inputFiles = fileManager.getFiles();
-
-            //
-            // Copy the JS extensions.
-            //
-            if( SessionManager.getInstance().isPlayBook() ) {
-                List< String > copiedFiles = copyExtensions( bbwpProperties, config );
-
-                if( copiedFiles != null ) {
-                    inputFiles.addAll( copiedFiles );
-                }
-            }
 
             // create autogen file
             WidgetConfigSerializer wcs = new WidgetConfig_v1Serializer( config );
             byte[] autogenFile = wcs.serialize();
             fileManager.writeToSource( autogenFile, AUTOGEN_FILE );
 
-//            Logger.logMessage( LogType.INFO, "PROGRESS_COMPILING" );
+            Logger.logMessage( LogType.INFO, "PROGRESS_COMPILING" );
 
             // TODO signing needs to be uncommented later
 //            if( ENABLE_SIGNING && sessionManager.requireSigning() ) {
@@ -142,7 +119,7 @@ public class WidgetPackager {
 
             // create output bar file
             Logger.logMessage( LogType.INFO, "PROGRESS_PACKAGING" );
-            new NativePackager( config, inputFiles ).run();
+            new NativePackager( config, fileManager.getFiles() ).run();
             Logger.logMessage( LogType.INFO, "PACKAGING_COMPLETE" );
 
             // clean source (if necessary)
@@ -174,78 +151,5 @@ public class WidgetPackager {
 
     public static Object[] getVersion() {
         return new Object[] { new WidgetPackager().getClass().getPackage().getImplementationVersion() };
-    }
-
-    /**
-     * Copies the correct set of extension source files from the extension repository into the project area so that they can be
-     * compiled along with the framework, and returns a hashtable populated with javascript file names for use downstream. Each
-     * key in the hashtable is the entry class name, and the value contains the relative pathnames of the corresponding javascript
-     * files.
-     * 
-     * @param bbwpProperties
-     *            the current widget properties.
-     * @param config
-     *            the current widget configuration.
-     * @return list of copied files path
-     */
-    private static List< String > copyExtensions( BBWPProperties bbwpProperties, WidgetConfig config )
-            throws IOException, PackageException {
-        //
-        // We need to copy the correct set of extension source files from the
-        // extension repository into the project area so that they can be
-        // compiled along with the framework.
-        // The correct set of extension source files is determined using
-        // the features identified in config.xml and the supported feature
-        // set of each library.xml.
-        //
-        Hashtable< WidgetAccess, Vector< WidgetFeature >> accessTable = config.getAccessTable();
-        // if the access table is empty, don't even bother since there's no features to search for
-        if( accessTable.size() > 0 ) {
-            //
-            // Go ahead and traverse the extension repository, looking for
-            // library.xml files to parse. This is independent of config.xml, so far.
-            //
-
-            ExtensionMap extensionMap = new ExtensionMap( "BBX", "default", bbwpProperties.getExtensionRepo( SessionManager
-                    .getInstance().getSessionHome() ) ); // location of the extension repository
-
-            //
-            // Extract the set of feature IDs from the access table.
-            // We flatten the structure since we don't care about the
-            // access node or whether it applies to local access; all
-            // we want are the unique feature IDs.
-            //
-            Set< String > featureIDs = new HashSet< String >();
-            for( Vector< WidgetFeature > accessTableValue : accessTable.values() ) {
-                for( WidgetFeature widgetFeature : accessTableValue ) {
-                    featureIDs.add( widgetFeature.getID() );
-                }
-            }
-
-            //
-            // For each feature ID in the set, we now perform the copying
-            // based on the extension map that we constructed from the
-            // library.xml files. The extension map will make sure we don't
-            // copy the same set of files twice.
-            //
-
-            for( String featureID : featureIDs ) {
-                //
-                // The ExtensionMap is responsible for avoiding duplication.
-                // In particular, extension sets are marked as such after
-                // they have been copied to avoid duplication.
-                //
-                // This method is also responsible for distinguishing between
-                // ActionScript and JavaScript source files. For this purpose
-                // file name extensions may be used.
-                //
-                extensionMap.copyRequiredFiles( SessionManager.getInstance().getSourceFolder(), // destination for extensions
-                        featureID );
-            }
-            
-            return extensionMap.getCopiedFiles();
-        }
-        
-        return null;
     }
 }

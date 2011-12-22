@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 Research In Motion Limited.
+ * Copyright 2011 Research In Motion Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package net.rim.tumbler.serialize;
 
-import java.lang.reflect.Field;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
@@ -28,12 +27,8 @@ import net.rim.tumbler.config.WidgetFeature;
 import net.rim.tumbler.json4j.JSONArray;
 import net.rim.tumbler.json4j.JSONException;
 import net.rim.tumbler.json4j.JSONObject;
-import net.rim.tumbler.session.SessionManager;
+import net.rim.tumbler.util.SessionMocker;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -44,19 +39,10 @@ import org.junit.Test;
  * Given values parsed from XML, test if the serializer writes correct values to the JSON object
  */
 public class SerializerTest {
-    private static Mockery _context = new JUnit4Mockery() {
-        {
-            setImposteriser( ClassImposteriser.INSTANCE );
-        }
-    };
-
     private WidgetConfig _widgetConfig;
     private WidgetConfig_v1Serializer _serializer;
-    private static SessionManager _session = _context.mock( SessionManager.class );
-    
-    private static final String TLD = "$$ac$$ad$$ae$$aero$$af$$ag$$ai$$al$$am$$an$$ao$$aq$$ar$$arpa$$as$$asia$$at$$au$$aw$$ax$$az$$ba$$bb$$bd$$be$$bf$$bg$$bh$$bi$$biz$$bj$$bm$$bn$$bo$$br$$bs$$bt$$bv$$bw$$by$$bz$$ca$$cat$$cc$$cd$$cf$$cg$$ch$$ci$$ck$$cl$$cm$$cn$$co$$com$$coop$$cr$$cu$$cv$$cx$$cy$$cz$$de$$dj$$dk$$dm$$do$$dz$$ec$$edu$$ee$$eg$$er$$es$$et$$eu$$fi$$fj$$fk$$fm$$fo$$fr$$ga$$gb$$gd$$ge$$gf$$gg$$gh$$gi$$gl$$gm$$gn$$gov$$gp$$gq$$gr$$gs$$gt$$gu$$gw$$gy$$hk$$hm$$hn$$hr$$ht$$hu$$id$$ie$$il$$im$$in$$info$$int$$io$$iq$$ir$$is$$it$$je$$jm$$jo$$jobs$$jp$$ke$$kg$$kh$$ki$$km$$kn$$kp$$kr$$kw$$ky$$kz$$la$$lb$$lc$$li$$lk$$lr$$ls$$lt$$lu$$lv$$ly$$ma$$mc$$md$$me$$mg$$mh$$mil$$mk$$ml$$mm$$mn$$mo$$mobi$$mp$$mq$$mr$$ms$$mt$$mu$$museum$$mv$$mw$$mx$$my$$mz$$na$$name$$nc$$ne$$net$$nf$$ng$$ni$$nl$$no$$np$$nr$$nu$$nz$$om$$org$$pa$$pe$$pf$$pg$$ph$$pk$$pl$$pm$$pn$$pr$$pro$$ps$$pt$$pw$$py$$qa$$re$$ro$$rs$$ru$$rw$$sa$$sb$$sc$$sd$$se$$sg$$sh$$si$$sj$$sk$$sl$$sm$$sn$$so$$sr$$st$$su$$sv$$sy$$sz$$tc$$td$$tel$$tf$$tg$$th$$tj$$tk$$tl$$tm$$tn$$to$$tp$$tr$$travel$$tt$$tv$$tw$$tz$$ua$$ug$$uk$$us$$uy$$uz$$va$$vc$$ve$$vg$$vi$$vn$$vu$$wf$$ws$$xn--0zwm56d$$xn--11b5bs3a9aj6g$$xn--80akhbyknj4f$$xn--9t4b11yi5a$$xn--deba0ad$$xn--g6w251d$$xn--hgbk6aj7f53bba$$xn--hlcj6aya9esc7a$$xn--jxalpdlp$$xn--kgbechtv$$xn--zckzah$$ye$$yt$$yu$$za$$zm$$zw$$";
     private static final boolean DEBUG_ENABLED = false;
-    private static final boolean VERBOSE = false;    
+    
     
     private static Hashtable< WidgetAccess, Vector< WidgetFeature >> getTestAccessTable() throws Exception {
         Hashtable< WidgetAccess, Vector< WidgetFeature >> accessTable = new Hashtable< WidgetAccess, Vector< WidgetFeature >>();
@@ -82,25 +68,9 @@ public class SerializerTest {
         return accessTable;
     }
     
-    private static void mockSession() throws Exception {
-        // mock SessionManager which is used by WidgetConfig and WidgetAccess
-        _context.checking( new Expectations() {
-            {
-                allowing( _session ).getTLD(); will( returnValue( TLD ) );
-                allowing( _session ).debugMode(); will( returnValue( DEBUG_ENABLED ) );
-                allowing( _session ).isVerbose(); will( returnValue( VERBOSE ) );
-            }
-        } );
-
-        Class< ? > c = SessionManager.class;
-        Field singleton = c.getDeclaredField( "_instance" );
-        singleton.setAccessible( true );
-        singleton.set( null, _session );
-    }
-    
     @BeforeClass
     public static void runBeforeClass() throws Exception {
-        mockSession();
+        SessionMocker.mockSession( null );
     }
 
     @Test

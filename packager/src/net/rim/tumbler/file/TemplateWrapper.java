@@ -43,7 +43,7 @@ public class TemplateWrapper {
             // Populate destination path
             TemplateFile df = _templates.get( e.nextElement() );
             String strOutputFile = toDirectory + System.getProperty( "file.separator" ) + df.getName();
-            result.add( strOutputFile );
+            result.add( new File( strOutputFile ).getAbsolutePath() );
 
             // Create directory
             String strDirectory = strOutputFile

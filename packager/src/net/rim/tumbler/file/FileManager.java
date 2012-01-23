@@ -36,6 +36,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import net.rim.tumbler.WidgetPackager;
+import net.rim.tumbler.WidgetPackager.Target;
 import net.rim.tumbler.config.WidgetAccess;
 import net.rim.tumbler.config.WidgetConfig;
 import net.rim.tumbler.config.WidgetFeature;
@@ -50,13 +51,15 @@ public class FileManager {
     private WidgetConfig _config;
     private BBWPProperties _bbwpProperties;
     private Vector< String > _inputFiles;
+    private Target _target;
 
     private static final String FILE_SEP = System.getProperty( "file.separator" );
-
-    public FileManager( WidgetConfig config, BBWPProperties bbwpProperties ) {
+    
+    public FileManager( WidgetConfig config, BBWPProperties bbwpProperties, Target target ) {
         _config = config;
         _bbwpProperties = bbwpProperties;
         _inputFiles = new Vector< String >();
+        _target = target;
     }
 
     public void cleanSource() {
@@ -66,10 +69,14 @@ public class FileManager {
     }
 
     private void copyWWExecutable() throws IOException {
-        File target = new File( SessionManager.getInstance().getSourceFolder(), WidgetPackager.WW_EXECUTABLE_FILE );
-        copyFile( new File( SessionManager.getInstance().getBBWPJarFolder() + FILE_SEP + WidgetPackager.WW_EXECUTABLE_FILE ),
-                target );
-        _inputFiles.add( target.getAbsolutePath() );
+        String executableName = _target.getExecutableFile();
+        
+        if (executableName != null){
+            File target = new File( SessionManager.getInstance().getSourceFolder(), WidgetPackager.WW_EXECUTABLE_NAME );
+            copyFile( new File( SessionManager.getInstance().getBBWPJarFolder() + FILE_SEP + executableName ),
+                    target );
+            _inputFiles.add( target.getAbsolutePath() );
+        }
     }
 
     private void copyLib() throws IOException {

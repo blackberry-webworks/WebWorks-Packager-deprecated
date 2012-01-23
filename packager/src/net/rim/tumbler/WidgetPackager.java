@@ -34,7 +34,24 @@ public class WidgetPackager {
 
     public static final String PROPERTIES_FILE = "bbwp.properties";
     public static final String SIGNATURE_KEY_FILE = "sigtool.csk";
-    public static final String WW_EXECUTABLE_FILE = "wwe";
+    public static final String WW_EXECUTABLE_FILE_DEVICE = "wwe_device";
+    public static final String WW_EXECUTABLE_FILE_SIMULATOR = "wwe_simulator";
+    public static final String WW_EXECUTABLE_NAME = "wwe";
+    
+    public static enum Target{
+        DESKTOP, DEVICE, SIMULATOR;
+        
+        public String getExecutableFile(){
+            switch (this) {
+            case DEVICE:
+                return WidgetPackager.WW_EXECUTABLE_FILE_DEVICE;
+            case SIMULATOR:
+                return WidgetPackager.WW_EXECUTABLE_FILE_SIMULATOR;
+            default:
+                return null;
+            }
+        }
+    }
 
     private static final String AUTOGEN_FILE = "chrome/lib/config/user.js";
     private static final String MODULES_FILE = "chrome/frameworkModules.js";
@@ -84,52 +101,62 @@ public class WidgetPackager {
             XMLParser xmlparser = new ConfigXMLParser();
             WidgetConfig config = xmlparser.parseXML( wa ); // raw data, without \
 
-            // create/clean outputs/source
-            // Logger.printInfoMessage("Widget packaging starts...");
-            FileManager fileManager = new FileManager( config, bbwpProperties );
-            Logger.logMessage( LogType.INFO, "PROGRESS_FILE_POPULATING_SOURCE" );
-            fileManager.prepare();
-
-            // create autogen file
-            WidgetConfigSerializer wcs = new WidgetConfig_v1Serializer( config );
-            byte[] autogenFile = wcs.serialize();
-            fileManager.writeToSource( autogenFile, AUTOGEN_FILE );
+            for (int i = 0; i < Target.values().length;i++){
+                Target currentTarget = Target.values()[i];
             
-            fileManager.writeToSource( fileManager.generateFrameworkModulesJSFile(), MODULES_FILE );
+                // create/clean outputs/source
+                // Logger.printInfoMessage("Widget packaging starts...");
+                FileManager fileManager = new FileManager( config, bbwpProperties, currentTarget );
+                Logger.logMessage( LogType.INFO, "PROGRESS_FILE_POPULATING_SOURCE" );
+                fileManager.prepare();
+    
+                // create autogen file
+                WidgetConfigSerializer wcs = new WidgetConfig_v1Serializer( config );
+                byte[] autogenFile = wcs.serialize();
+                fileManager.writeToSource( autogenFile, AUTOGEN_FILE );
+    
+                    fileManager.writeToSource( fileManager.generateFrameworkModulesJSFile(), MODULES_FILE );
 
-            Logger.logMessage( LogType.INFO, "PROGRESS_COMPILING" );
-
-            // TODO signing needs to be uncommented later
-//            if( ENABLE_SIGNING && sessionManager.requireSigning() ) {
-//                Logger.logMessage( LogType.INFO, "PROGRESS_SIGNING" );
-//                if( SessionManager.getInstance().isPlayBook() ) {
-//                    try {
-//                        SigningSupport.signBar( bbwpProperties );
-//                    } catch( Exception e ) {
-//                        File barFile = new File( sessionManager.getOutputFilepath() );
-//                        if( barFile.isFile() ) {
-//                            barFile.delete();
-//                        }
-//                        throw e;
-//                    }
-//                } else {
-//                    signCod( sessionManager );
-//                }
-//                Logger.logMessage( LogType.INFO, "PROGRESS_SIGNING_COMPLETE" );
-//            }          
-
-            Logger.logMessage( LogType.INFO, "PROGRESS_GEN_OUTPUT" );
-
-            // create output bar file
-            Logger.logMessage( LogType.INFO, "PROGRESS_PACKAGING" );
-            new NativePackager( config, fileManager.getFiles() ).run();
-            Logger.logMessage( LogType.INFO, "PACKAGING_COMPLETE" );
-
-            // clean source (if necessary)
-            if( !sessionManager.requireSource() ) {
-                fileManager.cleanSource();
+                Logger.logMessage( LogType.INFO, "PROGRESS_COMPILING" );
+    
+                // TODO signing needs to be uncommented later
+    //            if( ENABLE_SIGNING && sessionManager.requireSigning() ) {
+    //                Logger.logMessage( LogType.INFO, "PROGRESS_SIGNING" );
+    //                if( SessionManager.getInstance().isPlayBook() ) {
+    //                    try {
+    //                        SigningSupport.signBar( bbwpProperties );
+    //                    } catch( Exception e ) {
+    //                        File barFile = new File( sessionManager.getOutputFilepath() );
+    //                        if( barFile.isFile() ) {
+    //                            barFile.delete();
+    //                        }
+    //                        throw e;
+    //                    }
+    //                } else {
+    //                    signCod( sessionManager );
+    //                }
+    //                Logger.logMessage( LogType.INFO, "PROGRESS_SIGNING_COMPLETE" );
+    //            }          
+    
+                Logger.logMessage( LogType.INFO, "PROGRESS_GEN_OUTPUT" );
+    
+                switch (currentTarget) {
+                    case DESKTOP://TODO
+                        break;	
+                    case DEVICE:
+                    case SIMULATOR:
+                        // create output bar file
+                        Logger.logMessage( LogType.INFO, "PROGRESS_PACKAGING" );
+                        new NativePackager( config, fileManager.getFiles(), currentTarget ).run();
+                        Logger.logMessage( LogType.INFO, "PACKAGING_COMPLETE" );
+                        break;
+                }
+                
+                // clean source (if necessary)
+                if( !sessionManager.requireSource() ) {
+                    fileManager.cleanSource();
+                }
             }
-
             Logger.logMessage( LogType.INFO, "PROGRESS_COMPLETE" );
         } catch( CommandLineException cle ) {
             Logger.logMessage( LogType.ERROR, cle.getMessage(), cle.getInfo() );

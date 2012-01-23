@@ -33,6 +33,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.rim.tumbler.OSUtils;
 import net.rim.tumbler.WidgetPackager;
+import net.rim.tumbler.WidgetPackager.Target;
 import net.rim.tumbler.config.WidgetConfig;
 import net.rim.tumbler.exception.PackageException;
 import net.rim.tumbler.exception.ValidationException;
@@ -50,10 +51,12 @@ public class NativePackager {
 
     private WidgetConfig _config;
     private List< String > _files;
+    private Target _target;
     
-    public NativePackager( WidgetConfig config, List< String > files ) {
+    public NativePackager( WidgetConfig config, List< String > files, Target target ) {
         _config = config;
         _files = files;
+        _target = target;
     }
 
     private void generateTabletXML() throws ParserConfigurationException, DOMException, ValidationException, TransformerException {
@@ -97,7 +100,7 @@ public class NativePackager {
         Element asset = doc.createElement( "asset" );
         asset.setAttribute( "type", "qnx/elf" );
         asset.setAttribute( "entry", "true" );
-        asset.appendChild( doc.createTextNode( WidgetPackager.WW_EXECUTABLE_FILE ) );
+        asset.appendChild( doc.createTextNode( WidgetPackager.WW_EXECUTABLE_NAME ) );
         root.appendChild( asset );
 
         Element initialWindow = doc.createElement( "initialWindow" );
@@ -134,7 +137,7 @@ public class NativePackager {
     private void generateOptionsFile() throws IOException {
         File options = new File( SessionManager.getInstance().getSourceFolder(), "options" );
         BufferedWriter writer = new BufferedWriter( new FileWriter( options ) );
-        File outputDir = new File( SessionManager.getInstance().getOutputFolder() );
+        File outputDir = new File( SessionManager.getInstance().getOutputFolder() + File.separator + _target.name() );
 
         if( !outputDir.exists() ) {
             outputDir.mkdirs();

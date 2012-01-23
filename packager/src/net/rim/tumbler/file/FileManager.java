@@ -61,12 +61,6 @@ public class FileManager {
         sourceDir.mkdirs();
     }
 
-    private void copyBootstrapScript() throws IOException {
-        File target = new File( SessionManager.getInstance().getSourceFolder(), "/bin/bbx-framework" );
-        copyFile( new File( SessionManager.getInstance().getBBWPJarFolder() + "/bbx-framework" ), target );
-        _inputFiles.add( target.getAbsolutePath() );
-    }
-
     private void copyWWExecutable() throws IOException {
         File target = new File( SessionManager.getInstance().getSourceFolder(), WidgetPackager.WW_EXECUTABLE_FILE );
         copyFile( new File( SessionManager.getInstance().getBBWPJarFolder() + FILE_SEP + WidgetPackager.WW_EXECUTABLE_FILE ),
@@ -76,13 +70,8 @@ public class FileManager {
 
     private void copyLib() throws IOException {
         TemplateWrapper templateWrapper = new TemplateWrapper( _bbwpProperties.getTemplateDir() );
-        _inputFiles.addAll( templateWrapper.writeAllTemplates( SessionManager.getInstance().getSourceFolder() + "/lib" ) );
-    }
-
-    private void copyDependencies() throws IOException {
-        TemplateWrapper wrapper = new TemplateWrapper( _bbwpProperties.getDependenciesDir() );
-        _inputFiles.addAll( wrapper.writeAllTemplates( SessionManager.getInstance().getSourceFolder() + "/dependencies" ) );
-    }    
+        _inputFiles.addAll( templateWrapper.writeAllTemplates( SessionManager.getInstance().getSourceFolder() + "/chrome/lib" ) );
+    }   
 
     private void extractArchive() throws IOException {
         ZipFile zip = new ZipFile( new File( SessionManager.getInstance().getWidgetArchive() ).getAbsolutePath() );
@@ -96,7 +85,7 @@ public class FileManager {
                 continue;
 
             File zipEntryFile = new File( ze.getName() );
-            String fname = sourceFolder + File.separator + zipEntryFile.getPath();
+            String fname = sourceFolder + File.separator + "chrome" + File.separator + zipEntryFile.getPath();
 
             // extract file
             InputStream is = new BufferedInputStream( zip.getInputStream( ze ) );
@@ -172,13 +161,9 @@ public class FileManager {
     public void prepare() throws Exception {
         cleanSource();
 
-        copyBootstrapScript();
-
         copyWWExecutable();
 
         copyLib();
-
-        copyDependencies();
 
         extractArchive();
         

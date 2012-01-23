@@ -85,7 +85,7 @@ public class ExtensionMap {
         ExtensionDescriptor depDescriptor = _masterList.get( featureID );
 
         if( depDescriptor != null && !depDescriptor.isCopied() ) {
-            String javascriptPrefix = outputFolder + File.separator + "ext" + File.separator + featureID + File.separator;
+            String javascriptPrefix = outputFolder + File.separator + "chrome/ext" + File.separator + featureID + File.separator;
 
             for( ConfiguredPathname pathname : depDescriptor.getConfiguredPathnames() ) {
                 if( pathname.getPathname().endsWith( ".js" ) ) {

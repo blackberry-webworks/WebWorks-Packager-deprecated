@@ -49,11 +49,11 @@ public class FileManagerTest {
 
         Assert.assertTrue( new File( SOURCE_DIR + "/" + WidgetPackager.WW_EXECUTABLE_FILE ).exists() );
         Assert.assertTrue( new File( SOURCE_DIR + "/chrome/lib" ).exists() );
-        Assert.assertTrue( new File( SOURCE_DIR + "/chrome/icon.png" ).exists() );
+        Assert.assertTrue( new File( SOURCE_DIR + "/icon.png" ).exists() );
 
         List< String > files = fileMgr.getFiles();
         Assert.assertNotNull( files );
         Assert.assertTrue( files.contains( new File( SOURCE_DIR + "/" + WidgetPackager.WW_EXECUTABLE_FILE ).getAbsolutePath() ) );
-        Assert.assertTrue( files.contains( new File( SOURCE_DIR + "/chrome/icon.png" ).getAbsolutePath() ) );
+        Assert.assertTrue( files.contains( new File( SOURCE_DIR + "/icon.png" ).getAbsolutePath() ) );
     }
 }

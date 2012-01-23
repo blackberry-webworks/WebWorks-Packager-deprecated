@@ -37,7 +37,7 @@ public class WidgetPackager {
     public static final String WW_EXECUTABLE_FILE = "wwe";
 
     private static final String AUTOGEN_FILE = "chrome/lib/config/user.js";
-    private static final String PATHS_FILE = "chrome/paths.js";
+    private static final String MODULES_FILE = "chrome/frameworkModules.js";
 
     private static final int NO_ERROR_RETURN_CODE = 0;
     private static final int PACKAGE_ERROR_RCODE = 1;
@@ -95,7 +95,7 @@ public class WidgetPackager {
             byte[] autogenFile = wcs.serialize();
             fileManager.writeToSource( autogenFile, AUTOGEN_FILE );
             
-            fileManager.writeToSource( fileManager.generatePathsJSFile(), PATHS_FILE );
+            fileManager.writeToSource( fileManager.generateFrameworkModulesJSFile(), MODULES_FILE );
 
             Logger.logMessage( LogType.INFO, "PROGRESS_COMPILING" );
 

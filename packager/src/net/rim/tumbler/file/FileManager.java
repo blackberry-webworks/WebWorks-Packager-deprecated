@@ -75,7 +75,21 @@ public class FileManager {
     private void copyLib() throws IOException {
         TemplateWrapper templateWrapper = new TemplateWrapper( _bbwpProperties.getTemplateDir() );
         _inputFiles.addAll( templateWrapper.writeAllTemplates( SessionManager.getInstance().getSourceFolder() + "/chrome/lib" ) );
-    }   
+    }
+
+    private void copyBootstrapHTML() throws IOException {
+        File target = new File( SessionManager.getInstance().getSourceFolder() + "/chrome", "index.html" );
+        File src = new File( _bbwpProperties.getTemplateDir() + "/public", "index.html" );
+        copyFile( src, target );
+        _inputFiles.add( target.getAbsolutePath() );
+    }
+    
+    private void copyRequireJS() throws IOException {
+        File target = new File( SessionManager.getInstance().getSourceFolder() + "/chrome", "require.js" );
+        File src = new File( _bbwpProperties.getDependenciesDir() + "/browser-require", "require.js" );
+        copyFile( src, target );
+        _inputFiles.add( target.getAbsolutePath() );
+    }
 
     private void extractArchive() throws IOException {
         ZipFile zip = new ZipFile( new File( SessionManager.getInstance().getWidgetArchive() ).getAbsolutePath() );
@@ -89,7 +103,7 @@ public class FileManager {
                 continue;
 
             File zipEntryFile = new File( ze.getName() );
-            String fname = sourceFolder + File.separator + "chrome" + File.separator + zipEntryFile.getPath();
+            String fname = sourceFolder + File.separator + zipEntryFile.getPath();
 
             // extract file
             InputStream is = new BufferedInputStream( zip.getInputStream( ze ) );
@@ -151,6 +165,10 @@ public class FileManager {
         copyWWExecutable();
 
         copyLib();
+        
+        copyBootstrapHTML();
+        
+        copyRequireJS();
 
         extractArchive();
         
@@ -172,7 +190,7 @@ public class FileManager {
         }
     }
     
-    public byte[] generatePathsJSFile() {
+    public byte[] generateFrameworkModulesJSFile() {
         String srcFolder = SessionManager.getInstance().getSourceFolder();
         File lib = new File( srcFolder + "/chrome/lib" );
         File ext = new File( srcFolder + "/chrome/ext" );
@@ -208,7 +226,7 @@ public class FileManager {
         }
 
         try {
-            StringBuffer buffer = new StringBuffer( "var paths = " );
+            StringBuffer buffer = new StringBuffer( "var frameworkModules = " );
             buffer.append( new JSONArray( relativePaths.toArray() ).toString( 4 ) );
             buffer.append( ";\n" );
             return buffer.toString().getBytes();

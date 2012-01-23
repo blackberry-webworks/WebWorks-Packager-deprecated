@@ -89,7 +89,7 @@ public class NativePackager {
         if( _config.getIconSrc() != null && !_config.getIconSrc().isEmpty() ) {
             Element icon = doc.createElement( "icon" );
             Element image = doc.createElement( "image" );
-            image.appendChild( doc.createTextNode( "chrome/" + _config.getIconSrc().firstElement() ) );
+            image.appendChild( doc.createTextNode( _config.getIconSrc().firstElement() ) );
             icon.appendChild( image );
             root.appendChild( icon );
         }

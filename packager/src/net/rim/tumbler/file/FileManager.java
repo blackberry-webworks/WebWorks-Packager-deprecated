@@ -20,10 +20,12 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -39,6 +41,8 @@ import net.rim.tumbler.config.WidgetConfig;
 import net.rim.tumbler.config.WidgetFeature;
 import net.rim.tumbler.exception.PackageException;
 import net.rim.tumbler.extension.ExtensionMap;
+import net.rim.tumbler.json4j.JSONArray;
+import net.rim.tumbler.json4j.JSONException;
 import net.rim.tumbler.session.BBWPProperties;
 import net.rim.tumbler.session.SessionManager;
 
@@ -102,6 +106,27 @@ public class FileManager {
         }
     }
 
+    private Set< String > getWhitelistedFeatures() {
+        Hashtable< WidgetAccess, Vector< WidgetFeature >> accessTable = _config.getAccessTable();
+        Set< String > featureIDs = new HashSet< String >();
+        // if the access table is empty, don't even bother since there's no features to search for
+        if( accessTable != null && accessTable.size() > 0 ) {
+            //
+            // Extract the set of feature IDs from the access table.
+            // We flatten the structure since we don't care about the
+            // access node or whether it applies to local access; all
+            // we want are the unique feature IDs.
+            //
+            for( Vector< WidgetFeature > accessTableValue : accessTable.values() ) {
+                for( WidgetFeature widgetFeature : accessTableValue ) {
+                    featureIDs.add( widgetFeature.getID() );
+                }
+            }
+        }
+
+        return featureIDs;
+    }
+
     /**
      * Copies the correct set of extension source files from the extension repository into the project area so that they can be
      * compiled along with the framework, and returns a hashtable populated with javascript file names for use downstream. Each
@@ -109,55 +134,17 @@ public class FileManager {
      * files.
      */
     private void copyExtensions() throws IOException, PackageException {
-        Hashtable< WidgetAccess, Vector< WidgetFeature >> accessTable = _config.getAccessTable();
-        // if the access table is empty, don't even bother since there's no features to search for
-        if( accessTable != null && accessTable.size() > 0 ) {
-            //
-            // Go ahead and traverse the extension repository, looking for
-            // library.xml files to parse. This is independent of config.xml, so far.
-            //
+        ExtensionMap extensionMap = new ExtensionMap( "BBX", "default", _bbwpProperties.getExtensionRepo( SessionManager
+                .getInstance().getSessionHome() ) ); // location of the extension repository
 
-            ExtensionMap extensionMap = new ExtensionMap( "BBX", "default", _bbwpProperties.getExtensionRepo( SessionManager
-                    .getInstance().getSessionHome() ) ); // location of the extension repository
-
-            //
-            // Extract the set of feature IDs from the access table.
-            // We flatten the structure since we don't care about the
-            // access node or whether it applies to local access; all
-            // we want are the unique feature IDs.
-            //
-            Set< String > featureIDs = new HashSet< String >();
-            for( Vector< WidgetFeature > accessTableValue : accessTable.values() ) {
-                for( WidgetFeature widgetFeature : accessTableValue ) {
-                    featureIDs.add( widgetFeature.getID() );
-                }
-            }
-
-            //
-            // For each feature ID in the set, we now perform the copying
-            // based on the extension map that we constructed from the
-            // library.xml files. The extension map will make sure we don't
-            // copy the same set of files twice.
-            //
-
-            for( String featureID : featureIDs ) {
-                //
-                // The ExtensionMap is responsible for avoiding duplication.
-                // In particular, extension sets are marked as such after
-                // they have been copied to avoid duplication.
-                //
-                // This method is also responsible for distinguishing between
-                // ActionScript and JavaScript source files. For this purpose
-                // file name extensions may be used.
-                //
-                extensionMap.copyRequiredFiles( SessionManager.getInstance().getSourceFolder(), // destination for extensions
-                        featureID );
-            }
-            
-            _inputFiles.addAll( extensionMap.getCopiedFiles() );
+        for( String featureID : getWhitelistedFeatures() ) {
+            extensionMap.copyRequiredFiles( SessionManager.getInstance().getSourceFolder(), // destination for extensions
+                    featureID );
         }
-    }    
-    
+
+        _inputFiles.addAll( extensionMap.getCopiedFiles() );
+    }
+
     public void prepare() throws Exception {
         cleanSource();
 
@@ -179,9 +166,74 @@ public class FileManager {
             FileOutputStream fos = new FileOutputStream( s );
             fos.write( fileToWrite );
             fos.close();
+            _inputFiles.add( new File( s ).getAbsolutePath() );
         } catch( Exception e ) {
             throw new PackageException( e, relativeFile );
         }
+    }
+    
+    public byte[] generatePathsJSFile() {
+        String srcFolder = SessionManager.getInstance().getSourceFolder();
+        File lib = new File( srcFolder + "/chrome/lib" );
+        File ext = new File( srcFolder + "/chrome/ext" );
+        FilenameFilter libFilter = new FilenameFilter() {
+            @Override
+            public boolean accept( File dir, String name ) {
+                if( !dir.getName().equals( "public" ) ) {
+                    return new File( dir, name ).isDirectory() || name.toLowerCase().endsWith( ".js" );
+                }
+
+                return false;
+            }
+        };
+        FilenameFilter extFilter = new FilenameFilter() {
+            @Override
+            public boolean accept( File dir, String name ) {
+                if( new File( dir, name ).isDirectory() ) {
+                    return true;
+                } else if( getWhitelistedFeatures().contains( dir.getName() ) ) {
+                    return name.toLowerCase().endsWith( ".js" );
+                }
+
+                return false;
+            }
+        };
+        List< File > files = new ArrayList< File >();
+        List< String > relativePaths = new ArrayList< String >();
+        files.addAll( listFiles( lib, libFilter ) );
+        files.addAll( listFiles( ext, extFilter ) );
+
+        for( File f : files ) {
+            relativePaths.add( new File( srcFolder + "/chrome" ).toURI().relativize( f.toURI() ).getPath() );
+        }
+
+        try {
+            StringBuffer buffer = new StringBuffer( "var paths = " );
+            buffer.append( new JSONArray( relativePaths.toArray() ).toString( 4 ) );
+            buffer.append( ";\n" );
+            return buffer.toString().getBytes();
+        } catch( JSONException e ) {
+            throw new RuntimeException( e );
+        }
+    }
+
+    private List< File > listFiles( File dir, FilenameFilter filter ) {
+        List< File > files = new ArrayList< File >();
+
+        if( dir.exists() ) {
+            if( dir.isDirectory() ) {
+                File[] children = dir.listFiles( filter );
+                for( File child : children ) {
+                    if( child.isDirectory() ) {
+                        files.addAll( listFiles( child, filter ) );
+                    } else {
+                        files.add( child );
+                    }
+                }
+            }
+        }
+
+        return files;
     }
 
     // Copy a file

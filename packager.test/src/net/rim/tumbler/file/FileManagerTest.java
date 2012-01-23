@@ -47,17 +47,13 @@ public class FileManagerTest {
         FileManager fileMgr = new FileManager( _config, _bbwpProperties );
         fileMgr.prepare();
 
-        Assert.assertTrue( new File( SOURCE_DIR + "/bin" ).exists() );
-        Assert.assertTrue( new File( SOURCE_DIR + "/bin/bbx-framework" ).exists() );
         Assert.assertTrue( new File( SOURCE_DIR + "/" + WidgetPackager.WW_EXECUTABLE_FILE ).exists() );
-        Assert.assertTrue( new File( SOURCE_DIR + "/dependencies" ).exists() );
-        Assert.assertTrue( new File( SOURCE_DIR + "/lib" ).exists() );
-        Assert.assertTrue( new File( SOURCE_DIR + "/icon.png" ).exists() );
+        Assert.assertTrue( new File( SOURCE_DIR + "/chrome/lib" ).exists() );
+        Assert.assertTrue( new File( SOURCE_DIR + "/chrome/icon.png" ).exists() );
 
         List< String > files = fileMgr.getFiles();
         Assert.assertNotNull( files );
-        Assert.assertTrue( files.contains( new File( SOURCE_DIR + "/bin/bbx-framework" ).getAbsolutePath() ) );
         Assert.assertTrue( files.contains( new File( SOURCE_DIR + "/" + WidgetPackager.WW_EXECUTABLE_FILE ).getAbsolutePath() ) );
-        Assert.assertTrue( files.contains( new File( SOURCE_DIR + "/icon.png" ).getAbsolutePath() ) );
+        Assert.assertTrue( files.contains( new File( SOURCE_DIR + "/chrome/icon.png" ).getAbsolutePath() ) );
     }
 }

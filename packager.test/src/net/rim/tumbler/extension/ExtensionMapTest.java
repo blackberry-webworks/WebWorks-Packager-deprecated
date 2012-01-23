@@ -73,7 +73,7 @@ public class ExtensionMapTest {
         File outputDir = new File( SessionManager.getInstance().getSourceFolder() );
         Assert.assertTrue( outputDir.exists() );
 
-        File extDir = new File( outputDir, "ext" );
+        File extDir = new File( outputDir, "chrome/ext" );
         Assert.assertTrue( extDir.exists() );
 
         File invokeDir = new File( extDir, "blackberry.invoke" );
@@ -96,7 +96,7 @@ public class ExtensionMapTest {
         File outputDir = new File( SessionManager.getInstance().getSourceFolder() );
         Assert.assertTrue( outputDir.exists() );
 
-        File extDir = new File( outputDir, "ext" );
+        File extDir = new File( outputDir, "chrome/ext" );
         Assert.assertFalse( extDir.exists() );
     }
 }

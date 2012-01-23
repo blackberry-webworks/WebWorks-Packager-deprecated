@@ -16,6 +16,7 @@
 	<build>
 		<plugins>
 			<!-- unzip framework -->
+            <!-- unzip packager-bin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -35,12 +36,18 @@
 									<type>zip</type>
 									<overWrite>true</overWrite>
 								</artifactItem>
+                                <artifactItem>
+									<groupId>net.rim.BBXwebworks</groupId>
+									<artifactId>packager-bin</artifactId>
+									<version>1.0.0.1</version>
+									<type>zip</type>
+									<overWrite>true</overWrite>
+								</artifactItem>
 							</artifactItems>
 						</configuration>
 				  </execution>
 				</executions>
 			</plugin>
-
 
 			<!-- copy bin folder -->
 			<!-- copy bbwp executables -->

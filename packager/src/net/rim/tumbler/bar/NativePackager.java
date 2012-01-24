@@ -32,11 +32,11 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import net.rim.tumbler.OSUtils;
-import net.rim.tumbler.WidgetPackager;
 import net.rim.tumbler.WidgetPackager.Target;
 import net.rim.tumbler.config.WidgetConfig;
 import net.rim.tumbler.exception.PackageException;
 import net.rim.tumbler.exception.ValidationException;
+import net.rim.tumbler.file.Paths;
 import net.rim.tumbler.processbuffer.ErrorBuffer;
 import net.rim.tumbler.processbuffer.ExitBuffer;
 import net.rim.tumbler.processbuffer.OutputBuffer;
@@ -103,7 +103,7 @@ public class NativePackager {
         Element asset = doc.createElement( "asset" );
         asset.setAttribute( "type", "qnx/elf" );
         asset.setAttribute( "entry", "true" );
-        asset.appendChild( doc.createTextNode( WidgetPackager.WW_EXECUTABLE_NAME ) );
+        asset.appendChild( doc.createTextNode( Paths.WW_EXECUTABLE_NAME ) );
         root.appendChild( asset );
 
         Element initialWindow = doc.createElement( "initialWindow" );
@@ -173,7 +173,7 @@ public class NativePackager {
         }
 
         Process p = Runtime.getRuntime().exec(
-                new String[] { new File( _bbwpProperties.getDependenciesDir() + "/tools/bin", script ).getAbsolutePath(),
+                new String[] { new File( _bbwpProperties.getDependenciesDir() + Paths.NATIVE_PACKAGER_RELATIVE_PATH, script ).getAbsolutePath(),
                         "@options" }, null, cwd );
 
         OutputBuffer stdout = new OutputBuffer( p );

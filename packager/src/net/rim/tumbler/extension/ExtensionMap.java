@@ -24,6 +24,7 @@ import java.util.Vector;
 
 import net.rim.tumbler.exception.PackageException;
 import net.rim.tumbler.file.FileManager;
+import net.rim.tumbler.file.Paths;
 
 public class ExtensionMap {
 
@@ -85,11 +86,11 @@ public class ExtensionMap {
         ExtensionDescriptor depDescriptor = _masterList.get( featureID );
 
         if( depDescriptor != null && !depDescriptor.isCopied() ) {
-            String javascriptPrefix = outputFolder + File.separator + "chrome/ext" + File.separator + featureID + File.separator;
+            File apiDir = new File( Paths.EXT_DIR, featureID );
 
             for( ConfiguredPathname pathname : depDescriptor.getConfiguredPathnames() ) {
                 if( pathname.getPathname().endsWith( ".js" ) ) {
-                    File target = new File( javascriptPrefix + pathname.getPathname() );
+                    File target = new File( apiDir, pathname.getPathname() );
                     FileManager.copyFile( new File( depDescriptor.getRootFolder(), pathname.getPathname() ), target );
                     _copiedFiles.add( target.getAbsolutePath() );
                 } else {

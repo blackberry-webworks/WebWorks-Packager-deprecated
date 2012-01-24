@@ -51,6 +51,7 @@ public class FileManager {
     private WidgetConfig _config;
     private BBWPProperties _bbwpProperties;
     private Vector< String > _inputFiles;
+    private File _sourceFolder;
 
     private static final String FILE_SEP = System.getProperty( "file.separator" );
     
@@ -58,44 +59,44 @@ public class FileManager {
         _config = config;
         _bbwpProperties = bbwpProperties;
         _inputFiles = new Vector< String >();
+        _sourceFolder = Paths.SOURCE_DIR;
     }
 
-    public void cleanSource() {
-        File sourceDir = new File( SessionManager.getInstance().getSourceFolder() );        
-        deleteDirectory( sourceDir );
-        sourceDir.mkdirs();
+    public void cleanSource() {        
+        deleteDirectory( _sourceFolder );
+        _sourceFolder.mkdirs();
     }
 
     public void copyWWExecutable( Target buildTarget ) throws IOException {
         String folderName = buildTarget.getExecutableFolder();
 
         if( folderName != null ) {
-            File targetFile = new File( SessionManager.getInstance().getSourceFolder(), WidgetPackager.WW_EXECUTABLE_NAME );
+            File targetFile = new File( _sourceFolder, Paths.WW_EXECUTABLE_NAME );
 
             if( targetFile.exists() ) {
                 targetFile.delete();
             }
 
             copyFile( new File( _bbwpProperties.getDependenciesDir() + FILE_SEP + folderName + FILE_SEP
-                    + WidgetPackager.WW_EXECUTABLE_NAME ), targetFile );
+                    + Paths.WW_EXECUTABLE_NAME ), targetFile );
             _inputFiles.add( targetFile.getAbsolutePath() );
         }
     }
 
     private void copyLib() throws IOException {
         TemplateWrapper templateWrapper = new TemplateWrapper( _bbwpProperties.getTemplateDir() );
-        _inputFiles.addAll( templateWrapper.writeAllTemplates( SessionManager.getInstance().getSourceFolder() + "/chrome/lib" ) );
+        _inputFiles.addAll( templateWrapper.writeAllTemplates( Paths.LIB_DIR.getAbsolutePath() ) );
     }
 
     private void copyBootstrapFiles() throws IOException {
-        TemplateWrapper templatewrapper = new TemplateWrapper( _bbwpProperties.getDependenciesDir() + "/bootstrap" );
-        _inputFiles.addAll( templatewrapper.writeAllTemplates( SessionManager.getInstance().getSourceFolder() + "/chrome" ) );
+        TemplateWrapper templatewrapper = new TemplateWrapper( new File( _bbwpProperties.getDependenciesDir(),
+                Paths.BOOTSTRAP_DIR_NAME ).getAbsolutePath() );
+        _inputFiles.addAll( templatewrapper.writeAllTemplates( Paths.CHROME_DIR.getAbsolutePath() ) );
     }
 
     private void extractArchive() throws IOException {
         ZipFile zip = new ZipFile( new File( SessionManager.getInstance().getWidgetArchive() ).getAbsolutePath() );
         Enumeration< ? > en = zip.entries();
-        String sourceFolder = SessionManager.getInstance().getSourceFolder();
 
         while( en.hasMoreElements() ) {
             // create output file name
@@ -104,14 +105,13 @@ public class FileManager {
                 continue;
 
             File zipEntryFile = new File( ze.getName() );
-            String fname = sourceFolder + File.separator + zipEntryFile.getPath();
 
             // extract file
             InputStream is = new BufferedInputStream( zip.getInputStream( ze ) );
-            File fi = new File( fname );
+            File fi = new File( _sourceFolder, zipEntryFile.getPath() );
             if( !fi.getParentFile().isDirectory() || !fi.getParentFile().exists() )
                 fi.getParentFile().mkdirs();
-            OutputStream fos = new BufferedOutputStream( new FileOutputStream( fname ) );
+            OutputStream fos = new BufferedOutputStream( new FileOutputStream( fi ) );
             int bytesRead;
             while( ( bytesRead = is.read() ) != -1 )
                 fos.write( bytesRead );
@@ -172,33 +172,30 @@ public class FileManager {
         copyExtensions();
     }
 
-    public void writeToSource( byte[] fileToWrite, String relativeFile ) throws Exception {
+    public void writeToSource( byte[] fileToWrite, String file ) throws Exception {
         try {
-            String s = SessionManager.getInstance().getSourceFolder() + FILE_SEP + relativeFile;
-            if( !new File( s ).exists() ) {
-                new File( s ).getParentFile().mkdirs();
+            File f = new File( file );
+            if( !new File( file ).isAbsolute() ) {
+                f = new File( _sourceFolder, file );
             }
-            FileOutputStream fos = new FileOutputStream( s );
+
+            if( !f.exists() ) {
+                f.getParentFile().mkdirs();
+            }
+            FileOutputStream fos = new FileOutputStream( f );
             fos.write( fileToWrite );
             fos.close();
-            _inputFiles.add( new File( s ).getAbsolutePath() );
+            _inputFiles.add( f.getAbsolutePath() );
         } catch( Exception e ) {
-            throw new PackageException( e, relativeFile );
+            throw new PackageException( e, file );
         }
     }
-    
+
     public byte[] generateFrameworkModulesJSFile() {
-        String srcFolder = SessionManager.getInstance().getSourceFolder();
-        File lib = new File( srcFolder + "/chrome/lib" );
-        File ext = new File( srcFolder + "/chrome/ext" );
         FilenameFilter libFilter = new FilenameFilter() {
             @Override
             public boolean accept( File dir, String name ) {
-                if( !dir.getName().equals( "public" ) ) {
-                    return new File( dir, name ).isDirectory() || name.toLowerCase().endsWith( ".js" );
-                }
-
-                return false;
+                return new File( dir, name ).isDirectory() || name.toLowerCase().endsWith( ".js" );
             }
         };
         FilenameFilter extFilter = new FilenameFilter() {
@@ -215,11 +212,11 @@ public class FileManager {
         };
         List< File > files = new ArrayList< File >();
         List< String > relativePaths = new ArrayList< String >();
-        files.addAll( listFiles( lib, libFilter ) );
-        files.addAll( listFiles( ext, extFilter ) );
+        files.addAll( listFiles( Paths.LIB_DIR, libFilter ) );
+        files.addAll( listFiles( Paths.EXT_DIR, extFilter ) );
 
         for( File f : files ) {
-            relativePaths.add( new File( srcFolder + "/chrome" ).toURI().relativize( f.toURI() ).getPath() );
+            relativePaths.add( Paths.CHROME_DIR.toURI().relativize( f.toURI() ).getPath() );
         }
 
         try {

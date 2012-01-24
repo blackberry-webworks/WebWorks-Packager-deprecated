@@ -21,6 +21,7 @@ import net.rim.tumbler.exception.CommandLineException;
 import net.rim.tumbler.exception.PackageException;
 import net.rim.tumbler.exception.ValidationException;
 import net.rim.tumbler.file.FileManager;
+import net.rim.tumbler.file.Paths;
 import net.rim.tumbler.log.LogType;
 import net.rim.tumbler.log.Logger;
 import net.rim.tumbler.serialize.WidgetConfigSerializer;
@@ -34,9 +35,6 @@ public class WidgetPackager {
 
     public static final String PROPERTIES_FILE = "bbwp.properties";
     public static final String SIGNATURE_KEY_FILE = "sigtool.csk";
-    public static final String WW_EXECUTABLE_DEVICE_FOLDER = "device-wwe";
-    public static final String WW_EXECUTABLE_SIMULATOR_FOLDER = "simulator-wwe";
-    public static final String WW_EXECUTABLE_NAME = "wwe";
 
     public static enum Target {
         DESKTOP, DEVICE, SIMULATOR;
@@ -44,17 +42,14 @@ public class WidgetPackager {
         public String getExecutableFolder() {
             switch( this ) {
                 case DEVICE:
-                    return WidgetPackager.WW_EXECUTABLE_DEVICE_FOLDER;
+                    return Paths.DEVICE_WWE_DIR_NAME;
                 case SIMULATOR:
-                    return WidgetPackager.WW_EXECUTABLE_SIMULATOR_FOLDER;
+                    return Paths.SIMULATOR_WWE_DIR_NAME;
                 default:
                     return null;
             }
         }
     }
-    
-    private static final String AUTOGEN_FILE = "chrome/lib/config/user.js";
-    private static final String MODULES_FILE = "chrome/frameworkModules.js";
 
     private static final int NO_ERROR_RETURN_CODE = 0;
     private static final int PACKAGE_ERROR_RCODE = 1;
@@ -109,10 +104,10 @@ public class WidgetPackager {
             // create autogen file
             WidgetConfigSerializer wcs = new WidgetConfig_v1Serializer( config );
             byte[] autogenFile = wcs.serialize();
-            fileManager.writeToSource( autogenFile, AUTOGEN_FILE );
+            fileManager.writeToSource( autogenFile, Paths.USER_JS_FILE.getAbsolutePath() );
 
             // create framework modules JS file
-            fileManager.writeToSource( fileManager.generateFrameworkModulesJSFile(), MODULES_FILE );
+            fileManager.writeToSource( fileManager.generateFrameworkModulesJSFile(), Paths.MODULES_JS_FILE.getAbsolutePath() );
 
             Logger.logMessage( LogType.INFO, "PROGRESS_COMPILING" );
     

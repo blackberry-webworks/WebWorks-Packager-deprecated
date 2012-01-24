@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.List;
 
 import junit.framework.Assert;
-import net.rim.tumbler.WidgetPackager;
 import net.rim.tumbler.WidgetPackager.Target;
 import net.rim.tumbler.config.WidgetConfig;
 import net.rim.tumbler.session.BBWPProperties;
@@ -61,6 +60,6 @@ public class FileManagerTest {
     public void testCopyWWExecutable() throws IOException {
         FileManager fileManager = new FileManager( _config, _bbwpProperties );
         fileManager.copyWWExecutable( Target.SIMULATOR );
-        Assert.assertTrue( new File( SOURCE_DIR + "/" + WidgetPackager.WW_EXECUTABLE_NAME ).exists() );
+        Assert.assertTrue( new File( SOURCE_DIR + "/" + Paths.WW_EXECUTABLE_NAME ).exists() );
     }
 }

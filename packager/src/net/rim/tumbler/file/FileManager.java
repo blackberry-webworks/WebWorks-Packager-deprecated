@@ -67,16 +67,17 @@ public class FileManager {
     }
 
     public void copyWWExecutable( Target buildTarget ) throws IOException {
-        String executableName = buildTarget.getExecutableFile();
+        String folderName = buildTarget.getExecutableFolder();
 
-        if( executableName != null ) {
+        if( folderName != null ) {
             File targetFile = new File( SessionManager.getInstance().getSourceFolder(), WidgetPackager.WW_EXECUTABLE_NAME );
 
             if( targetFile.exists() ) {
                 targetFile.delete();
             }
 
-            copyFile( new File( SessionManager.getInstance().getBBWPJarFolder() + FILE_SEP + executableName ), targetFile );
+            copyFile( new File( _bbwpProperties.getDependenciesDir() + FILE_SEP + folderName + FILE_SEP
+                    + WidgetPackager.WW_EXECUTABLE_NAME ), targetFile );
             _inputFiles.add( targetFile.getAbsolutePath() );
         }
     }
@@ -86,18 +87,9 @@ public class FileManager {
         _inputFiles.addAll( templateWrapper.writeAllTemplates( SessionManager.getInstance().getSourceFolder() + "/chrome/lib" ) );
     }
 
-    private void copyBootstrapHTML() throws IOException {
-        File target = new File( SessionManager.getInstance().getSourceFolder() + "/chrome", "index.html" );
-        File src = new File( _bbwpProperties.getTemplateDir() + "/public", "index.html" );
-        copyFile( src, target );
-        _inputFiles.add( target.getAbsolutePath() );
-    }
-
-    private void copyRequireJS() throws IOException {
-        File target = new File( SessionManager.getInstance().getSourceFolder() + "/chrome", "require.js" );
-        File src = new File( _bbwpProperties.getDependenciesDir() + "/browser-require", "require.js" );
-        copyFile( src, target );
-        _inputFiles.add( target.getAbsolutePath() );
+    private void copyBootstrapFiles() throws IOException {
+        TemplateWrapper templatewrapper = new TemplateWrapper( _bbwpProperties.getDependenciesDir() + "/bootstrap" );
+        _inputFiles.addAll( templatewrapper.writeAllTemplates( SessionManager.getInstance().getSourceFolder() + "/chrome" ) );
     }
 
     private void extractArchive() throws IOException {
@@ -170,12 +162,10 @@ public class FileManager {
 
     public void prepare() throws Exception {
         cleanSource();
+        
+        copyBootstrapFiles();
 
-        copyLib();
-        
-        copyBootstrapHTML();
-        
-        copyRequireJS();
+        copyLib();        
 
         extractArchive();
         

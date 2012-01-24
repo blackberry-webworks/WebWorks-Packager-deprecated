@@ -24,12 +24,22 @@ import net.rim.tumbler.session.BBWPProperties;
 import net.rim.tumbler.util.SessionMocker;
 import net.rim.tumbler.util.WidgetConfigMocker;
 
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
+import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class NativePackagerTest {
+    private static Mockery _context = new JUnit4Mockery() {
+        {
+            setImposteriser( ClassImposteriser.INSTANCE );
+        }
+    };    
     private static BBWPProperties _bbwpProperties;
+    private static BBWPProperties _bbwpPropNativePkgr = _context.mock( BBWPProperties.class );;
     private static WidgetConfig _config;
     private static String toolsDir = OSUtils.isMac() ? "/Users/build/testrun/qnxtools copy/bin" : "C:\\testrun\\qnxtools copy\\bin";
 
@@ -38,6 +48,11 @@ public class NativePackagerTest {
         SessionMocker.mockSession( toolsDir );
         _config = WidgetConfigMocker.getInstance().getConfig();
         _bbwpProperties = new BBWPProperties( "../packager.test/src/bbxwebworks/bin/bbwp.properties", SessionMocker.getSessionHome() );
+        _context.checking( new Expectations() {
+            {
+                allowing( _bbwpPropNativePkgr ).getDependenciesDir(); will( returnValue( toolsDir ) );
+            }
+        } );
     }
 
     @Test
@@ -46,7 +61,7 @@ public class NativePackagerTest {
             FileManager fileMgr = new FileManager( _config, _bbwpProperties );
             fileMgr.prepare();
             fileMgr.copyWWExecutable( Target.SIMULATOR );
-            new NativePackager( _config, fileMgr.getFiles(), Target.SIMULATOR ).run();
+            new NativePackager( _bbwpPropNativePkgr, _config, fileMgr.getFiles(), Target.SIMULATOR ).run();
         } catch( Exception e ) {
             e.printStackTrace();
             Assert.fail( "Exception caught in NativePackager.run()" );

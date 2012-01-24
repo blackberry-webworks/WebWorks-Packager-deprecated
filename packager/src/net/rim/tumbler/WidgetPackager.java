@@ -34,25 +34,25 @@ public class WidgetPackager {
 
     public static final String PROPERTIES_FILE = "bbwp.properties";
     public static final String SIGNATURE_KEY_FILE = "sigtool.csk";
-    public static final String WW_EXECUTABLE_FILE_DEVICE = "wwe_device";
-    public static final String WW_EXECUTABLE_FILE_SIMULATOR = "wwe_simulator";
+    public static final String WW_EXECUTABLE_DEVICE_FOLDER = "device-wwe";
+    public static final String WW_EXECUTABLE_SIMULATOR_FOLDER = "simulator-wwe";
     public static final String WW_EXECUTABLE_NAME = "wwe";
-    
+
     public static enum Target {
         DESKTOP, DEVICE, SIMULATOR;
 
-        public String getExecutableFile() {
+        public String getExecutableFolder() {
             switch( this ) {
                 case DEVICE:
-                    return WidgetPackager.WW_EXECUTABLE_FILE_DEVICE;
+                    return WidgetPackager.WW_EXECUTABLE_DEVICE_FOLDER;
                 case SIMULATOR:
-                    return WidgetPackager.WW_EXECUTABLE_FILE_SIMULATOR;
+                    return WidgetPackager.WW_EXECUTABLE_SIMULATOR_FOLDER;
                 default:
                     return null;
             }
         }
     }
-
+    
     private static final String AUTOGEN_FILE = "chrome/lib/config/user.js";
     private static final String MODULES_FILE = "chrome/frameworkModules.js";
 
@@ -147,7 +147,7 @@ public class WidgetPackager {
                     case DEVICE:
                     case SIMULATOR:
                         fileManager.copyWWExecutable( currentTarget );
-                        new NativePackager( config, fileManager.getFiles(), currentTarget ).run();
+                        new NativePackager( bbwpProperties, config, fileManager.getFiles(), currentTarget ).run();
                         break;
                 }
             }

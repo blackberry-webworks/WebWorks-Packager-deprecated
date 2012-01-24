@@ -40,6 +40,7 @@ import net.rim.tumbler.exception.ValidationException;
 import net.rim.tumbler.processbuffer.ErrorBuffer;
 import net.rim.tumbler.processbuffer.ExitBuffer;
 import net.rim.tumbler.processbuffer.OutputBuffer;
+import net.rim.tumbler.session.BBWPProperties;
 import net.rim.tumbler.session.SessionManager;
 
 import org.w3c.dom.DOMException;
@@ -49,11 +50,13 @@ import org.w3c.dom.Element;
 public class NativePackager {    
     private static final String NL = System.getProperty( "line.separator" );
 
+    private BBWPProperties _bbwpProperties;
     private WidgetConfig _config;
     private List< String > _files;
     private Target _target;
     
-    public NativePackager( WidgetConfig config, List< String > files, Target target ) {
+    public NativePackager( BBWPProperties bbwpProperties, WidgetConfig config, List< String > files, Target target ) {
+        _bbwpProperties = bbwpProperties;
         _config = config;
         _files = files;
         _target = target;
@@ -170,8 +173,8 @@ public class NativePackager {
         }
 
         Process p = Runtime.getRuntime().exec(
-                new String[] { new File( session.getBBWPJarFolder() + "/tools/bin", script ).getAbsolutePath(), "@options" },
-                null, cwd );
+                new String[] { new File( _bbwpProperties.getDependenciesDir() + "/tools/bin", script ).getAbsolutePath(),
+                        "@options" }, null, cwd );
 
         OutputBuffer stdout = new OutputBuffer( p );
         ErrorBuffer stderr = new ErrorBuffer( p );

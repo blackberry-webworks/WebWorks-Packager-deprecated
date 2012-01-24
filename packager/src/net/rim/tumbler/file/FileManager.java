@@ -51,15 +51,13 @@ public class FileManager {
     private WidgetConfig _config;
     private BBWPProperties _bbwpProperties;
     private Vector< String > _inputFiles;
-    private Target _target;
 
     private static final String FILE_SEP = System.getProperty( "file.separator" );
     
-    public FileManager( WidgetConfig config, BBWPProperties bbwpProperties, Target target ) {
+    public FileManager( WidgetConfig config, BBWPProperties bbwpProperties ) {
         _config = config;
         _bbwpProperties = bbwpProperties;
         _inputFiles = new Vector< String >();
-        _target = target;
     }
 
     public void cleanSource() {
@@ -68,14 +66,18 @@ public class FileManager {
         sourceDir.mkdirs();
     }
 
-    private void copyWWExecutable() throws IOException {
-        String executableName = _target.getExecutableFile();
-        
-        if (executableName != null){
-            File target = new File( SessionManager.getInstance().getSourceFolder(), WidgetPackager.WW_EXECUTABLE_NAME );
-            copyFile( new File( SessionManager.getInstance().getBBWPJarFolder() + FILE_SEP + executableName ),
-                    target );
-            _inputFiles.add( target.getAbsolutePath() );
+    public void copyWWExecutable( Target buildTarget ) throws IOException {
+        String executableName = buildTarget.getExecutableFile();
+
+        if( executableName != null ) {
+            File targetFile = new File( SessionManager.getInstance().getSourceFolder(), WidgetPackager.WW_EXECUTABLE_NAME );
+
+            if( targetFile.exists() ) {
+                targetFile.delete();
+            }
+
+            copyFile( new File( SessionManager.getInstance().getBBWPJarFolder() + FILE_SEP + executableName ), targetFile );
+            _inputFiles.add( targetFile.getAbsolutePath() );
         }
     }
 
@@ -90,7 +92,7 @@ public class FileManager {
         copyFile( src, target );
         _inputFiles.add( target.getAbsolutePath() );
     }
-    
+
     private void copyRequireJS() throws IOException {
         File target = new File( SessionManager.getInstance().getSourceFolder() + "/chrome", "require.js" );
         File src = new File( _bbwpProperties.getDependenciesDir() + "/browser-require", "require.js" );
@@ -122,7 +124,7 @@ public class FileManager {
             while( ( bytesRead = is.read() ) != -1 )
                 fos.write( bytesRead );
             fos.close();
-            
+
             _inputFiles.add( fi.getAbsolutePath() );
         }
     }
@@ -168,8 +170,6 @@ public class FileManager {
 
     public void prepare() throws Exception {
         cleanSource();
-
-        copyWWExecutable();
 
         copyLib();
         

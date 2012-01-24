@@ -38,17 +38,17 @@ public class WidgetPackager {
     public static final String WW_EXECUTABLE_FILE_SIMULATOR = "wwe_simulator";
     public static final String WW_EXECUTABLE_NAME = "wwe";
     
-    public static enum Target{
+    public static enum Target {
         DESKTOP, DEVICE, SIMULATOR;
-        
-        public String getExecutableFile(){
-            switch (this) {
-            case DEVICE:
-                return WidgetPackager.WW_EXECUTABLE_FILE_DEVICE;
-            case SIMULATOR:
-                return WidgetPackager.WW_EXECUTABLE_FILE_SIMULATOR;
-            default:
-                return null;
+
+        public String getExecutableFile() {
+            switch( this ) {
+                case DEVICE:
+                    return WidgetPackager.WW_EXECUTABLE_FILE_DEVICE;
+                case SIMULATOR:
+                    return WidgetPackager.WW_EXECUTABLE_FILE_SIMULATOR;
+                default:
+                    return null;
             }
         }
     }
@@ -101,23 +101,20 @@ public class WidgetPackager {
             XMLParser xmlparser = new ConfigXMLParser();
             WidgetConfig config = xmlparser.parseXML( wa ); // raw data, without \
 
-            for (int i = 0; i < Target.values().length;i++){
-                Target currentTarget = Target.values()[i];
-            
-                // create/clean outputs/source
-                // Logger.printInfoMessage("Widget packaging starts...");
-                FileManager fileManager = new FileManager( config, bbwpProperties, currentTarget );
-                Logger.logMessage( LogType.INFO, "PROGRESS_FILE_POPULATING_SOURCE" );
-                fileManager.prepare();
-    
-                // create autogen file
-                WidgetConfigSerializer wcs = new WidgetConfig_v1Serializer( config );
-                byte[] autogenFile = wcs.serialize();
-                fileManager.writeToSource( autogenFile, AUTOGEN_FILE );
-    
-                    fileManager.writeToSource( fileManager.generateFrameworkModulesJSFile(), MODULES_FILE );
+            // create/clean outputs/source
+            FileManager fileManager = new FileManager( config, bbwpProperties );
+            Logger.logMessage( LogType.INFO, "PROGRESS_FILE_POPULATING_SOURCE" );
+            fileManager.prepare();
 
-                Logger.logMessage( LogType.INFO, "PROGRESS_COMPILING" );
+            // create autogen file
+            WidgetConfigSerializer wcs = new WidgetConfig_v1Serializer( config );
+            byte[] autogenFile = wcs.serialize();
+            fileManager.writeToSource( autogenFile, AUTOGEN_FILE );
+
+            // create framework modules JS file
+            fileManager.writeToSource( fileManager.generateFrameworkModulesJSFile(), MODULES_FILE );
+
+            Logger.logMessage( LogType.INFO, "PROGRESS_COMPILING" );
     
                 // TODO signing needs to be uncommented later
     //            if( ENABLE_SIGNING && sessionManager.requireSigning() ) {
@@ -138,25 +135,30 @@ public class WidgetPackager {
     //                Logger.logMessage( LogType.INFO, "PROGRESS_SIGNING_COMPLETE" );
     //            }          
     
-                Logger.logMessage( LogType.INFO, "PROGRESS_GEN_OUTPUT" );
-    
-                switch (currentTarget) {
-                    case DESKTOP://TODO
-                        break;	
+            Logger.logMessage( LogType.INFO, "PROGRESS_GEN_OUTPUT" );
+
+            // create output bar file
+            Logger.logMessage( LogType.INFO, "PROGRESS_PACKAGING" );            
+
+            for( Target currentTarget : Target.values() ) {
+                switch( currentTarget ) {
+                    case DESKTOP:// TODO
+                        break;
                     case DEVICE:
                     case SIMULATOR:
-                        // create output bar file
-                        Logger.logMessage( LogType.INFO, "PROGRESS_PACKAGING" );
+                        fileManager.copyWWExecutable( currentTarget );
                         new NativePackager( config, fileManager.getFiles(), currentTarget ).run();
-                        Logger.logMessage( LogType.INFO, "PACKAGING_COMPLETE" );
                         break;
                 }
-                
-                // clean source (if necessary)
-                if( !sessionManager.requireSource() ) {
-                    fileManager.cleanSource();
-                }
             }
+
+            Logger.logMessage( LogType.INFO, "PACKAGING_COMPLETE" );            
+            
+            // clean source (if necessary)
+            if( !sessionManager.requireSource() ) {
+                fileManager.cleanSource();
+            }
+
             Logger.logMessage( LogType.INFO, "PROGRESS_COMPLETE" );
         } catch( CommandLineException cle ) {
             Logger.logMessage( LogType.ERROR, cle.getMessage(), cle.getInfo() );

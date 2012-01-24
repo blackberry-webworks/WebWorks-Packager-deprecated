@@ -17,6 +17,7 @@
 package net.rim.tumbler.bar;
 
 import net.rim.tumbler.OSUtils;
+import net.rim.tumbler.WidgetPackager.Target;
 import net.rim.tumbler.config.WidgetConfig;
 import net.rim.tumbler.file.FileManager;
 import net.rim.tumbler.session.BBWPProperties;
@@ -44,7 +45,8 @@ public class NativePackagerTest {
         try {
             FileManager fileMgr = new FileManager( _config, _bbwpProperties );
             fileMgr.prepare();
-            new NativePackager( _config, fileMgr.getFiles() ).run();
+            fileMgr.copyWWExecutable( Target.SIMULATOR );
+            new NativePackager( _config, fileMgr.getFiles(), Target.SIMULATOR ).run();
         } catch( Exception e ) {
             e.printStackTrace();
             Assert.fail( "Exception caught in NativePackager.run()" );

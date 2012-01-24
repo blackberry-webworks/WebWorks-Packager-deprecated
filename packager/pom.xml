@@ -30,20 +30,32 @@
     </dependencies>
 
     <build>
-        <testSourceDirectory>../packager.test/src</testSourceDirectory>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>2.3.2-SNAPSHOT</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-        <sourceDirectory>src</sourceDirectory>
-        <directory>target</directory>
-
         <plugins>
+            <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack-framework</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>		
+							<artifactItems>
+                                <artifactItem>
+									<groupId>net.rim.BBXwebworks</groupId>
+									<artifactId>packager-bin</artifactId>
+									<version>1.0.0.2</version>
+									<type>zip</type>
+									<overWrite>true</overWrite>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+				  </execution>
+				</executions>
+			</plugin>
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -71,6 +83,19 @@
                 </configuration>
             </plugin>
         </plugins>
+        
+        <testSourceDirectory>../packager.test/src</testSourceDirectory>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>findbugs-maven-plugin</artifactId>
+                    <version>2.3.2-SNAPSHOT</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <sourceDirectory>src</sourceDirectory>
+        <directory>target</directory>
         
         <resources>
             <resource>

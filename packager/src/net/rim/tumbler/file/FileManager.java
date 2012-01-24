@@ -35,7 +35,6 @@ import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import net.rim.tumbler.WidgetPackager;
 import net.rim.tumbler.WidgetPackager.Target;
 import net.rim.tumbler.config.WidgetAccess;
 import net.rim.tumbler.config.WidgetConfig;

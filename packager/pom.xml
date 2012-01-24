@@ -57,12 +57,25 @@
             </plugin>
 
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2.2</version>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                        <id>chmod</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
-                       <descriptors>
-                           <descriptor>bin-files.xml</descriptor>
-                       </descriptors>
+                    <executable>chmod</executable>
+                    <arguments>
+                        <argument>-R</argument>
+                        <argument>+x</argument>
+                        <argument>${project.basedir}/target/dependency/bin/tools/bin/</argument>
+                    </arguments>
                 </configuration>
             </plugin>
             

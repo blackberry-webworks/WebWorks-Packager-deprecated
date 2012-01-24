@@ -30,7 +30,7 @@ import org.junit.Test;
 public class NativePackagerTest {
     private static BBWPProperties _bbwpProperties;
     private static WidgetConfig _config;
-    private static String toolsDir = OSUtils.isMac() ? "/Users/build/testrun/qnxtools copy/bin" : "C:\\testrun\\qnxtools copy\\bin";
+    private static String toolsDir = OSUtils.isMac() ? "../target/dependency/bin" : "C:\\testrun\\qnxtools copy\\bin";
 
     @BeforeClass
     public static void runBeforeClass() throws Exception {

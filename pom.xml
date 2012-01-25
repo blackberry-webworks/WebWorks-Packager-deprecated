@@ -90,7 +90,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/dependency/bin</outputDirectory>
+                            <outputDirectory>${basedir}/target/dependency/dependencies</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>packager/target/dependency/bin</directory>

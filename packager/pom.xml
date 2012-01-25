@@ -32,28 +32,28 @@
     <build>
         <plugins>
             <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>unpack-framework</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>		
-							<artifactItems>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-framework</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>        
+                            <artifactItems>
                                 <artifactItem>
-									<groupId>net.rim.BBXwebworks</groupId>
-									<artifactId>packager-bin</artifactId>
-									<version>1.0.0.3</version>
-									<type>zip</type>
-									<overWrite>true</overWrite>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-				  </execution>
-				</executions>
+                                    <groupId>net.rim.BBXwebworks</groupId>
+                                    <artifactId>packager-bin</artifactId>
+                                    <version>1.0.0.3</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                  </execution>
+                </executions>
             </plugin>
 
             <plugin>

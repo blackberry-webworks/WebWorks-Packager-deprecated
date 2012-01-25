@@ -11,7 +11,20 @@ xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assemb
 	<fileSets>
         <fileSet>            
             <directory>target/dependency</directory>                    
-            <outputDirectory></outputDirectory>            
+            <outputDirectory></outputDirectory> 
+            <includes>
+                <include>**/*.*</include>
+                <include>**/LICENSE</include>
+            </includes>  
+        </fileSet>
+        <fileSet>            
+            <directory>target/dependency</directory>                    
+            <outputDirectory></outputDirectory> 
+            <excludes>
+                <exclude>**/*.*</exclude>
+                <exclude>**/LICENSE</exclude>
+            </excludes>
+            <fileMode>0755</fileMode>
         </fileSet>
     </fileSets>
 </assembly>

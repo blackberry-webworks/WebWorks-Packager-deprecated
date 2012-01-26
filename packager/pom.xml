@@ -28,7 +28,45 @@
             <version>2.5.1</version>
         </dependency>
     </dependencies>
-
+    
+    <profiles>
+        <profile>
+            <id>exec-configure-unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.1.1</version>
+                        <executions>
+                            <execution>
+                                <id>chmod</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <executable>chmod</executable>
+                            <arguments>
+                                <argument>-R</argument>
+                                <argument>+x</argument>
+                                <argument>${project.basedir}/target/dependency/bin/tools/bin/</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    
+    
     <build>
         <plugins>
             <plugin>
@@ -54,29 +92,6 @@
                         </configuration>
                   </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.1.1</version>
-                <executions>
-                    <execution>
-                        <id>chmod</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <executable>chmod</executable>
-                    <arguments>
-                        <argument>-R</argument>
-                        <argument>+x</argument>
-                        <argument>${project.basedir}/target/dependency/bin/tools/bin/</argument>
-                    </arguments>
-                </configuration>
             </plugin>
             
             <plugin>

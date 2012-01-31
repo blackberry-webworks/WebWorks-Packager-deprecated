@@ -1,5 +1,5 @@
 <project>
-    <groupId>net.rim.BBXwebworks</groupId>
+    <groupId>net.rim.BB10webworks</groupId>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>packager</artifactId>
     <version>1.0.0.0</version>

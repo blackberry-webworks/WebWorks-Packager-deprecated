@@ -1,7 +1,7 @@
 <project>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>net.rim.BBXwebworks</groupId>
-    <artifactId>BBXwebworks</artifactId>
+    <groupId>net.rim.BB10webworks</groupId>
+    <artifactId>BB10webworks</artifactId>
     <version>1.0.0.0</version>
     <name>${project.artifactId}-${project.version}</name>
     <packaging>pom</packaging>
@@ -29,7 +29,7 @@
 						<configuration>		
 							<artifactItems>		
 								<artifactItem>
-									<groupId>net.rim.BBXwebworks</groupId>
+									<groupId>net.rim.BB10webworks</groupId>
 									<artifactId>framework</artifactId>
 									<version>1.0.0.0</version>
 									<type>zip</type>
@@ -100,7 +100,7 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-									<groupId>net.rim.BBXwebworks</groupId>
+									<groupId>net.rim.BB10webworks</groupId>
 									<artifactId>packager</artifactId>
 									<version>1.0.0.0</version>
 									<type>jar</type>
